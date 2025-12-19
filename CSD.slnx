@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="CSD/CSD.csproj" />
+  <Project Path="CSDTableGenerator/CSDTableGenerator.csproj" />
+  <Project Path="ObjdumpCompare/ObjdumpCompare.csproj" />
+  <Project Path="PatternGenerator/PatternGenerator.csproj" />
+</Solution>
