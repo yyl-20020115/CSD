@@ -1,4 +1,6 @@
-namespace CSD;
+using CSD;
+
+namespace ObjdumpCompare;
 
 using System;
 using System.Collections.Generic;
@@ -92,7 +94,7 @@ public static class ObjdumpCompare
 
                 List<string> excludes = ["insb", "insd", "outsb", "outsw", "outsd", "movsb", "movsw", "movsd", "lodsb", "lodsw", "lodsd", "stosb", "stosw", "stosd", "scasb", "scasw", "scasd", "cmpsb", "cmpsw", "cmpsd", "prefetch", "prefetcht0", "prefetchnta", "ret", "iretd", "fld", "lea", "fxch", "fcom", "fcomp", "pause", "sahf", "mov", "popad", "popfd", "pushfd", "pushad", "xlatb", "frstor", "fnsave", "fldenv", "fnstenv", "rcl", "jle", "je", "jbe", "int1", "push", "wait", "popa", "pshufw", "movq", "movlps", "movlpd", "movhpd", "call", "jmp", "bound", "fsub", "fsubrp", "pop", "arpl", "aam", "dec", "and", "add", "fiadd", "fisttp", "sub", "enter", "sldt", "les", "lds", "lfs", "hlt", "str", "cmpxchg8b"];
 
-                var input = new ReversibleInputStream(rawX86);
+                var input = new ReversibleStream(rawX86);
                 Instruction instruction;
                 try
                 {

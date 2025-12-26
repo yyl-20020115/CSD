@@ -1,13 +1,14 @@
+using CSD;
 using System.Text;
 
-namespace CSD;
+namespace PatternGenerator;
 
 public static class PatternGenerator
 {
     public static void Main(string[] args)
     {
         var data = new byte[15];
-        var input = new ReversibleInputStream(data);
+        var input = new ReversibleStream(data);
         int mode = 32;
         int index = 0;
         while (true)

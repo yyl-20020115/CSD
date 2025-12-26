@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace CSD;
+namespace CSDTableGenerator;
 
 public static class TableGen
 {
@@ -155,7 +155,7 @@ public static class TableGen
         pfx_dict.Add("cast3", "P_c3");
     }
 
-    public static List<string?> mnm_list = [];
+    public static readonly List<string?> list = [];
 
     public static int Main(string[] args)
     {
@@ -172,9 +172,9 @@ public static class TableGen
             var n = list[i];
             var mnemonic = n.Attribute("mnemonic")?.Value;
             //Console.WriteLine(mnemonic);
-            if (mnm_list.Contains(mnemonic))
+            if (TableGen.list.Contains(mnemonic))
                 throw new InvalidOperationException("Multiple opcode definition for " + mnemonic);
-            mnm_list.Add(mnemonic);
+            TableGen.list.Add(mnemonic);
             var iclass = "";
             var vendor = "";
             var children = n.Elements().ToList();
@@ -298,30 +298,30 @@ public static class TableGen
                     }
                     else if (op.StartsWith("/X87="))
                     {
-                        Dictionary<string, string> tmp = [];
-                        tmp.Add("type", "grp_x87");
-                        tmp.Add("name", table_name + "__op_" + table_index + "__x87");
-                        tables[(table_name)].Add(table_index, tmp);
+                        Dictionary<string, string> dict = [];
+                        dict.Add("type", "grp_x87");
+                        dict.Add("name", table_name + "__op_" + table_index + "__x87");
+                        tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
                         table_index = string.Format("X2", int.TryParse(op.AsSpan(5, 2), System.Globalization.NumberStyles.HexNumber, null, out var res) ? res : 0);
                         table_size = 64;
                     }
                     else if (op.StartsWith("/RM="))
                     {
-                        Dictionary<string, string> tmp = [];
-                        tmp.Add("type", "grp_rm");
-                        tmp.Add("name", table_name + "__op_" + table_index + "__rm");
-                        tables[(table_name)].Add(table_index, tmp);
+                        Dictionary<string, string> dict = [];
+                        dict.Add("type", "grp_rm");
+                        dict.Add("name", table_name + "__op_" + table_index + "__rm");
+                        tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
                         table_index = string.Format("X2", int.TryParse(op.AsSpan(4, op.Length - 4), System.Globalization.NumberStyles.HexNumber, null, out int res) ? res : 0);
                         table_size = 8;
                     }
                     else if (op.StartsWith("/MOD="))
                     {
-                        Dictionary<string, string> tmp = [];
-                        tmp.Add("type", "grp_mod");
-                        tmp.Add("name", table_name + "__op_" + table_index + "__mod");
-                        tables[(table_name)].Add(table_index, tmp);
+                        Dictionary<string, string> dict = [];
+                        dict.Add("type", "grp_mod");
+                        dict.Add("name", table_name + "__op_" + table_index + "__mod");
+                        tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
                         string v2 = op.Substring(5, 7);
                         if (op.Length == 8)
@@ -335,30 +335,30 @@ public static class TableGen
                     }
                     else if (op.StartsWith("/O"))
                     {
-                        Dictionary<string, string> tmp = [];
-                        tmp.Add("type", "grp_osize");
-                        tmp.Add("name", table_name + "__op_" + table_index + "__osize");
-                        tables[(table_name)].Add(table_index, tmp);
+                        Dictionary<string, string> dict = [];
+                        dict.Add("type", "grp_osize");
+                        dict.Add("name", table_name + "__op_" + table_index + "__osize");
+                        tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
                         table_index = mode_dict[op.Substring(2, 4 - 2)];
                         table_size = 3;
                     }
                     else if (op.StartsWith("/A"))
                     {
-                        Dictionary<string, string> tmp = [];
-                        tmp.Add("type", "grp_asize");
-                        tmp.Add("name", table_name + "__op_" + table_index + "__asize");
-                        tables[(table_name)].Add(table_index, tmp);
+                        Dictionary<string, string> dict = [];
+                        dict.Add("type", "grp_asize");
+                        dict.Add("name", table_name + "__op_" + table_index + "__asize");
+                        tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
                         table_index = mode_dict[(op.Substring(2, 4 - 2))];
                         table_size = 3;
                     }
                     else if (op.StartsWith("/M"))
                     {
-                        Dictionary<string, string> tmp = [];
-                        tmp.Add("type", "grp_mode");
-                        tmp.Add("name", table_name + "__op_" + table_index + "__mode");
-                        tables[(table_name)].Add(table_index, tmp);
+                        Dictionary<string, string> dict = [];
+                        dict.Add("type", "grp_mode");
+                        dict.Add("name", table_name + "__op_" + table_index + "__mode");
+                        tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
                         table_index = mode_dict[(op.Substring(2, 4 - 2))];
                         table_size = 3;
@@ -370,10 +370,10 @@ public static class TableGen
                     }
                     else if (op.StartsWith("/"))
                     {
-                        Dictionary<string, string> tmp = [];
-                        tmp.Add("type", "grp_reg");
-                        tmp.Add("name", table_name + "__op_" + table_index + "__reg");
-                        tables[(table_name)].Add(table_index, tmp);
+                        Dictionary<string, string> dict = [];
+                        dict.Add("type", "grp_reg");
+                        dict.Add("name", table_name + "__op_" + table_index + "__reg");
+                        tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
                         table_index = string.Format("X2", int.TryParse(op.Substring(1, 2), out var vx) ? vx : 0);
                         table_size = 8;
@@ -389,10 +389,10 @@ public static class TableGen
                 }
                 if (vendor.Length > 0)
                 {
-                    Dictionary<string, string> tmp = [];
-                    tmp.Add("type", "grp_vendor");
-                    tmp.Add("name", table_name + "__op_" + table_index + "__vendor");
-                    tables[(table_name)].Add(table_index, tmp);
+                    Dictionary<string, string> dict = [];
+                    dict.Add("type", "grp_vendor");
+                    dict.Add("name", table_name + "__op_" + table_index + "__vendor");
+                    tables[(table_name)].Add(table_index, dict);
                     table_name = (string)tables[(table_name)][(table_index)][("name")];
                     table_index = vend_dict[(vendor)];
                     table_size = 2;
@@ -461,7 +461,7 @@ public static class TableGen
 
         // Generate operators list
         writer.Write("\npublic static readonly List<string> ops = [\n");
-        foreach (var m in mnm_list)
+        foreach (var m in TableGen.list)
             writer.Write("  \"" + m + "\",\n");
         writer.Write("];\n\n");
 
@@ -471,7 +471,7 @@ public static class TableGen
         writer.Write("];\n\n");
 
         writer.Write("\npublic static readonly List<string> operators_str = [\n");
-        foreach (var m in mnm_list)
+        foreach (var m in TableGen.list)
             writer.Write("  \"" + m + "\",\n");
         writer.Write("];\n\n");
 
@@ -482,12 +482,12 @@ public static class TableGen
             for (int i = 0; i < table_sizes[t]; i++)
             {
                 string index = $"{i:X02}";// string.format("%02X", i);
-                Dictionary<string, string> tmp = [];
-                tmp.Add("type", "invalid");
+                Dictionary<string, string> dict = [];
+                dict.Add("type", "invalid");
                 if (tables[t].TryGetValue(index, out Dictionary<string, string>? value))
                     writer.Write(Centry(index, value));
                 else
-                    writer.Write(Centry(index, tmp));
+                    writer.Write(Centry(index, dict));
             }
             writer.Write("};\n");
         }

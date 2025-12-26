@@ -6,8 +6,8 @@ public static class Program
     {
         if (args.Length == 0)
         {
-            var instruction = Dissassembler.Decode(new([5]), 32);
-            Console.WriteLine(instruction);
+            Console.WriteLine(
+                 Dissassembler.Decode(new([5]), 32));
             return 0;
         }
         else
@@ -23,10 +23,10 @@ public static class Program
                 data[i] = (byte)(byte.TryParse(args[i], System.Globalization.NumberStyles.HexNumber, null, out var v) ? v : 0);
             Console.Write("Raw bytes: ");
             for (int i = 0; i < args.Length; i++)
-                Console.Write("%2x ", data[i]);
+                Console.Write($"{data[i]:X2} ");
             Console.WriteLine();
-            var instruction = Dissassembler.Decode(new(data), size);
-            Console.WriteLine(instruction);
+            Console.WriteLine(
+                Dissassembler.Decode(new(data), size));
             return 0;
         }
     }
