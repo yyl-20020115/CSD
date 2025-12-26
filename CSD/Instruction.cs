@@ -1,4 +1,5 @@
 namespace CSD;
+
 using System.Collections.Generic;
 
 public class Instruction
@@ -49,7 +50,6 @@ public class Instruction
         hlt.Add("hlt");
     }
 
-    public static bool pattern = false;
     /*input;
       mode;
       add;*/
@@ -61,12 +61,12 @@ public class Instruction
     public Prefix pfx = new();
     public int opr_mode, adr_mode;
     public string branch_dist;
-    
+
     public Instruction()
     {
     }
 
-    public static List<string> sign_extends = ["cmp", "or", "imul", "adc", "sbb", "xor"];
+    public static readonly List<string> sign_extends = ["cmp", "or", "imul", "adc", "sbb", "xor"];
 
     public static string intel_size(int size) => size switch
     {
@@ -79,9 +79,9 @@ public class Instruction
         _ => throw new InvalidOperationException("Unknown operand size " + size),
     };
 
-    private static bool print_size = false;
 
-    public override string ToString()
+    public override string ToString() => ToString(false);
+    public string ToString(bool print_size = false)
     {
         int maxSize = 0;
         foreach (var op in operand)
@@ -95,22 +95,20 @@ public class Instruction
         foreach (var op in operand)
             op.maxSize = maxSize;
 
-        if (print_size)
-        {
-            return operand.Length switch
+        return print_size
+            ? operand.Length switch
             {
                 1 => $"({x86Length} bytes) {pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
                 2 => $"({x86Length} bytes) {pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}",
                 3 => $"({x86Length} bytes) {pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}, {operand[2]}",
                 _ => $"({x86Length} bytes) {pfx}{op + (branch_dist == null ? "" : " " + branch_dist)}",
+            }
+            : operand.Length switch
+            {
+                1 => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
+                2 => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]},{operand[1]}",
+                3 => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]},{operand[1]},{operand[2]}",
+                _ => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)}",
             };
-        }
-        return operand.Length switch
-        {
-            1 => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
-            2 => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]},{operand[1]}",
-            3 => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]},{operand[1]},{operand[2]}",
-            _ => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)}",
-        };
     }
 }

@@ -6,7 +6,7 @@ public static class Program
     {
         if (args.Length == 0)
         {
-            var instruction = Dis.Decode(new([5]), 32);
+            var instruction = Dissassembler.Decode(new([5]), 32);
             Console.WriteLine(instruction);
             return 0;
         }
@@ -25,7 +25,7 @@ public static class Program
             for (int i = 0; i < args.Length; i++)
                 Console.Write("%2x ", data[i]);
             Console.WriteLine();
-            var instruction = Dis.Decode(new(data), size);
+            var instruction = Dissassembler.Decode(new(data), size);
             Console.WriteLine(instruction);
             return 0;
         }

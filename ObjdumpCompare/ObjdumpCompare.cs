@@ -79,15 +79,15 @@ public static class ObjdumpCompare
                     || objdump.Contains("addr16")
                     || objdump.Contains("data16")
                     || objdump.StartsWith("nop")
-                    || objdump.Equals("lock")
-                    || objdump.Equals("cs")
-                    || objdump.Equals("ds")
-                    || objdump.Equals("es")
-                    || objdump.Equals("fs")
-                    || objdump.Equals("gs")
-                    || objdump.Equals("ss")
-                    || objdump.Equals("fnop")
-                    || objdump.Equals("xgetbv"))
+                    || objdump==("lock")
+                    || objdump==("cs")
+                    || objdump==("ds")
+                    || objdump==("es")
+                    || objdump==("fs")
+                    || objdump==("gs")
+                    || objdump==("ss")
+                    || objdump==("fnop")
+                    || objdump==("xgetbv"))
                     continue;
 
                 List<string> excludes = ["insb", "insd", "outsb", "outsw", "outsd", "movsb", "movsw", "movsd", "lodsb", "lodsw", "lodsd", "stosb", "stosw", "stosd", "scasb", "scasw", "scasd", "cmpsb", "cmpsw", "cmpsd", "prefetch", "prefetcht0", "prefetchnta", "ret", "iretd", "fld", "lea", "fxch", "fcom", "fcomp", "pause", "sahf", "mov", "popad", "popfd", "pushfd", "pushad", "xlatb", "frstor", "fnsave", "fldenv", "fnstenv", "rcl", "jle", "je", "jbe", "int1", "push", "wait", "popa", "pshufw", "movq", "movlps", "movlpd", "movhpd", "call", "jmp", "bound", "fsub", "fsubrp", "pop", "arpl", "aam", "dec", "and", "add", "fiadd", "fisttp", "sub", "enter", "sldt", "les", "lds", "lfs", "hlt", "str", "cmpxchg8b"];
@@ -96,7 +96,7 @@ public static class ObjdumpCompare
                 Instruction instruction;
                 try
                 {
-                    instruction = Dis.Decode(input, mode);
+                    instruction = Dissassembler.Decode(input, mode);
                     instruction.eip = address;
                 }
                 catch (Exception e)
@@ -121,7 +121,7 @@ public static class ObjdumpCompare
                     }
                     if ((instruction.op != "nop") || (!objdump.Contains("xchg")))
                         if (!excludes.Contains(instruction.op))
-                            if (!instruction.ToString().Replace("near ", "").Replace("0x", "").Replace("DWORD PTR ", "").Equals(objdump.Replace("0x", "")))
+                            if (instruction.ToString().Replace("near ", "").Replace("0x", "").Replace("DWORD PTR ", "")!=(objdump.Replace("0x", "")))
                                 Console.WriteLine(x86Bytes + " -> " + instruction + " != " + objdump);
                 }
                 catch (Exception e)

@@ -15,7 +15,7 @@ public static class PatternGenerator
             Instruction instruction;
             try
             {
-                instruction = Dis.Decode(input, mode);
+                instruction = Dissassembler.Decode(input, mode);
             }
             catch (InvalidOperationException e)
             {
@@ -34,7 +34,7 @@ public static class PatternGenerator
                     data[i] = 0;
                 continue;
             }
-            if (instruction.op.Equals("invalid"))
+            if (instruction.op==("invalid"))
             {
                 index = Advance(index, data);
                 if (index == -1)

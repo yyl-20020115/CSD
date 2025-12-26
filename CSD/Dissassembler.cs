@@ -2,7 +2,7 @@ namespace CSD;
 
 using static ZygoteOperand;
 using static Table;
-public static class Dis
+public static class Dissassembler
 {
 
     public static readonly ZygoteInstruction[][] itab = Table.itab_list;
@@ -118,40 +118,18 @@ public static class Dis
         // dependent decoding.
         if (mode == 64)
         {
-            if (REX_W(inst.pfx.rex) != 0)
-                inst.opr_mode = 64;
-            else if (inst.pfx.opr != 0)
-                inst.opr_mode = 16;
-            else if (P_DEF64(inst.zygote.prefix) != 0)
-                inst.opr_mode = 64;
-            else
-                inst.opr_mode = 32;
-            if (inst.pfx.adr != 0)
-                inst.adr_mode = 32;
-            else
-                inst.adr_mode = 64;
+            inst.opr_mode = REX_W(inst.pfx.rex) != 0 ? 64 : inst.pfx.opr != 0 ? 16 : P_DEF64(inst.zygote.prefix) != 0 ? 64 : 32;
+            inst.adr_mode = inst.pfx.adr != 0 ? 32 : 64;
         }
         else if (mode == 32)
         {
-            if (inst.pfx.opr != 0)
-                inst.opr_mode = 16;
-            else
-                inst.opr_mode = 32;
-            if (inst.pfx.adr != 0)
-                inst.adr_mode = 16;
-            else
-                inst.adr_mode = 32;
+            inst.opr_mode = inst.pfx.opr != 0 ? 16 : 32;
+            inst.adr_mode = inst.pfx.adr != 0 ? 16 : 32;
         }
         else if (mode == 16)
         {
-            if (inst.pfx.opr != 0)
-                inst.opr_mode = 32;
-            else
-                inst.opr_mode = 16;
-            if (inst.pfx.adr != 0)
-                inst.adr_mode = 32;
-            else
-                inst.adr_mode = 16;
+            inst.opr_mode = inst.pfx.opr != 0 ? 32 : 16;
+            inst.adr_mode = inst.pfx.adr != 0 ? 32 : 16;
         }
     }
 
@@ -178,7 +156,7 @@ public static class Dis
                 else
                     e = ie_nop;
                 inst.zygote = e;
-                inst.op = inst.zygote.@operator;
+                inst.op = inst.zygote.op;
                 return;
             }
         }
@@ -191,7 +169,7 @@ public static class Dis
             // 2byte opcodes can be modified by 0x66, F3, and F2 prefixes
             if (0x66 == inst.pfx.insn)
             {
-                if (itab[ITAB__PFX_SSE66__0F][curr].@operator!=("invalid"))
+                if (itab[ITAB__PFX_SSE66__0F][curr].op!=("invalid"))
                 {
                     table = ITAB__PFX_SSE66__0F;
                     //inst.pfx.opr = 0;
@@ -199,7 +177,7 @@ public static class Dis
             }
             else if (0xF2 == inst.pfx.insn)
             {
-                if (itab[ITAB__PFX_SSEF2__0F][curr].@operator!=("invalid"))
+                if (itab[ITAB__PFX_SSEF2__0F][curr].op!=("invalid"))
                 {
                     table = ITAB__PFX_SSEF2__0F;
                     inst.pfx.repne = 0;
@@ -207,7 +185,7 @@ public static class Dis
             }
             else if (0xF3 == inst.pfx.insn)
             {
-                if (itab[ITAB__PFX_SSEF3__0F][curr].@operator!=("invalid"))
+                if (itab[ITAB__PFX_SSEF3__0F][curr].op!=("invalid"))
                 {
                     table = ITAB__PFX_SSEF3__0F;
                     inst.pfx.repe = 0;
@@ -225,88 +203,71 @@ public static class Dis
             e = itab[table][index];
             // if @operator constant is a standard instruction constant
             // our search is over.
-            if (ops.Contains(e.@operator))
+            if (ops.Contains(e.op))
             {
-                if (e.@operator==("invalid"))
+                if (e.op==("invalid"))
                     if (did_peek)
                         input.Forward();
                 inst.zygote = e;
-                inst.op = e.@operator;
+                inst.op = e.op;
                 return;
             }
 
             table = e.prefix;
 
-            if (e.@operator==("grp_reg"))
+            if (e.op==("grp_reg"))
             {
                 peek = input.Byte;
                 did_peek = true;
                 index = MODRM_REG(peek);
             }
-            else if (e.@operator==("grp_mod"))
+            else if (e.op==("grp_mod"))
             {
                 peek = input.Byte;
                 did_peek = true;
                 index = MODRM_MOD(peek);
-                if (index == 3)
-                    index = ITAB__MOD_INDX__11;
-                else
-                    index = ITAB__MOD_INDX__NOT_11;
+                index = index == 3 ? ITAB__MOD_INDX__11 : ITAB__MOD_INDX__NOT_11;
             }
-            else if (e.@operator==("grp_rm"))
+            else if (e.op==("grp_rm"))
             {
                 curr = input.Byte;
                 input.Forward();
                 did_peek = false;
                 index = MODRM_RM(curr);
             }
-            else if (e.@operator==("grp_x87"))
+            else if (e.op==("grp_x87"))
             {
                 curr = input.Byte;
                 input.Forward();
                 did_peek = false;
                 index = curr - 0xC0;
             }
-            else if (e.@operator==("grp_osize"))
+            else if (e.op==("grp_osize"))
             {
-                if (inst.opr_mode == 64)
-                    index = ITAB__MODE_INDX__64;
-                else if (inst.opr_mode == 32)
-                    index = ITAB__MODE_INDX__32;
-                else
-                    index = ITAB__MODE_INDX__16;
+                index = inst.opr_mode == 64 ? ITAB__MODE_INDX__64 : inst.opr_mode == 32 ? ITAB__MODE_INDX__32 : ITAB__MODE_INDX__16;
             }
-            else if (e.@operator==("grp_asize"))
+            else if (e.op==("grp_asize"))
             {
-                if (inst.adr_mode == 64)
-                    index = ITAB__MODE_INDX__64;
-                else if (inst.adr_mode == 32)
-                    index = ITAB__MODE_INDX__32;
-                else
-                    index = ITAB__MODE_INDX__16;
+                index = inst.adr_mode == 64 ? ITAB__MODE_INDX__64 : inst.adr_mode == 32 ? ITAB__MODE_INDX__32 : ITAB__MODE_INDX__16;
             }
-            else if (e.@operator==("grp_mode"))
+            else if (e.op==("grp_mode"))
             {
-                if (mode == 64)
-                    index = ITAB__MODE_INDX__64;
-                else if (mode == 32)
-                    index = ITAB__MODE_INDX__32;
-                else
-                    index = ITAB__MODE_INDX__16;
+                index = mode == 64 ? ITAB__MODE_INDX__64 : mode == 32 ? ITAB__MODE_INDX__32 : ITAB__MODE_INDX__16;
             }
-            else if (e.@operator==("grp_vendor"))
+            else if (e.op==("grp_vendor"))
             {
-                if (vendor == VENDOR_INTEL)
-                    index = ITAB__VENDOR_INDX__INTEL;
-                else if (vendor == VENDOR_AMD)
-                    index = ITAB__VENDOR_INDX__AMD;
-                else
-                    throw new SystemException("unrecognized vendor id");
+                index = vendor == VENDOR_INTEL
+                    ? ITAB__VENDOR_INDX__INTEL
+                    : vendor == VENDOR_AMD ? ITAB__VENDOR_INDX__AMD : throw new SystemException("unrecognized vendor id");
             }
-            else if (e.@operator==("d3vil"))
+            else if (e.op == "d3vil")
+            {
                 throw new SystemException("invalid instruction @operator constant Id3vil");
+            }
             else
+            {
                 throw new SystemException("invalid instruction @operator constant");
+            }
         }
         //inst.zygote = e;
         //inst.@operator = e.@operator;
@@ -328,40 +289,20 @@ public static class Dis
                             | (inst.pfx.rex & REX_PFX_MASK(inst.zygote.prefix)));
 
             // calculate effective operand size 
-            if ((REX_W(inst.pfx.rex) != 0) || (P_DEF64(inst.zygote.prefix) != 0))
-                inst.opr_mode = 64;
-            else if (inst.pfx.opr != 0)
-                inst.opr_mode = 16;
-            else
-                inst.opr_mode = 32;
+            inst.opr_mode = (REX_W(inst.pfx.rex) != 0) || (P_DEF64(inst.zygote.prefix) != 0) ? 64 : inst.pfx.opr != 0 ? 16 : 32;
 
             // calculate effective address size
-            if (inst.pfx.adr != 0)
-                inst.adr_mode = 32;
-            else
-                inst.adr_mode = 64;
+            inst.adr_mode = inst.pfx.adr != 0 ? 32 : 64;
         }
         else if (mode == 32) // set 32bit-mode flags
         {
-            if (inst.pfx.opr != 0)
-                inst.opr_mode = 16;
-            else
-                inst.opr_mode = 32;
-            if (inst.pfx.adr != 0)
-                inst.adr_mode = 16;
-            else
-                inst.adr_mode = 32;
+            inst.opr_mode = inst.pfx.opr != 0 ? 16 : 32;
+            inst.adr_mode = inst.pfx.adr != 0 ? 16 : 32;
         }
         else if (mode == 16) // set 16bit-mode flags
         {
-            if (inst.pfx.opr != 0)
-                inst.opr_mode = 32;
-            else
-                inst.opr_mode = 16;
-            if (inst.pfx.adr != 0)
-                inst.adr_mode = 32;
-            else
-                inst.adr_mode = 16;
+            inst.opr_mode = inst.pfx.opr != 0 ? 32 : 16;
+            inst.adr_mode = inst.pfx.adr != 0 ? 32 : 16;
         }
     }
 
@@ -390,7 +331,7 @@ public static class Dis
         else if (inst.op==("3dnow"))
         {
             // resolve 3dnow weirdness 
-            inst.op = itab[ITAB__3DNOW][input.Byte].@operator;
+            inst.op = itab[ITAB__3DNOW][input.Byte].op;
         }
         // SWAPGS is only valid in 64bits mode
         if ((inst.op==("swapgs")) && (mode != 64))
@@ -428,7 +369,7 @@ public static class Dis
         //iop = inst.operand
 
         if (mopt[0] == OP_A)
-            decode_a(mode, inst, input, inst.operand[0]);
+            DecodeA(mode, inst, input, inst.operand[0]);
         // M[b] ... 
         // E, G/P/V/I/CL/1/S 
         else if ((mopt[0] == OP_M) || (mopt[0] == OP_E))
@@ -765,7 +706,7 @@ public static class Dis
                 inst.operand[i].type = null;
     }
 
-    private static void decode_a(int mode, Instruction inst, ReversibleInputStream input, Operand op)
+    private static void DecodeA(int mode, Instruction inst, ReversibleInputStream input, Operand op)
     {
         //Decodes operands of the type seg:offset.
         if (inst.opr_mode == 16)
@@ -992,16 +933,10 @@ public static class Dis
 
     private static string ResolveGpr64(int mode, Instruction inst, int gpr_op)
     {
-        int index = 0;
-        if ((OP_rAXr8 <= gpr_op) && (OP_rDIr15 >= gpr_op))
-            index = (gpr_op - OP_rAXr8) | (REX_B(inst.pfx.rex) << 3);
-        else
-            index = gpr_op - OP_rAX;
-        if (inst.opr_mode == 16)
-            return GPR[("16")][(index)];
-        else if ((mode == 32) || !((inst.opr_mode == 32) && (REX_W(inst.pfx.rex) == 0)))
-            return GPR[("32")][index];
-        return GPR[("64")][(index)];
+        int index = (OP_rAXr8 <= gpr_op) && (OP_rDIr15 >= gpr_op) ? (gpr_op - OP_rAXr8) | (REX_B(inst.pfx.rex) << 3) : gpr_op - OP_rAX;
+        return inst.opr_mode == 16
+            ? GPR[("16")][(index)]
+            : (mode == 32) || !((inst.opr_mode == 32) && (REX_W(inst.pfx.rex) == 0)) ? GPR[("32")][index] : GPR[("64")][(index)];
     }
 
     private static int ResolveOperandSize(int mode, Instruction inst, int s) => s == SZ_V
@@ -1025,5 +960,6 @@ public static class Dis
             && (inst.pfx.rex != 0) ? rm >= 4 ? GPR[("8")][(rm + 4)] : GPR[("8")][(rm)] : GPR[("8")][(rm)] : null;
     }
 
-    private static string ResolveReg(string regtype, int i) => GPR[regtype][i];
+    private static string ResolveReg(string regtype, int i) 
+        => GPR[regtype][i];
 }
