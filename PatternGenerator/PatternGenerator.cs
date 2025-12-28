@@ -47,7 +47,7 @@ public static class PatternGenerator
                 pattern.Append($"{data[c] & 0xFF:X2}");
             // mask out with DD and II
             var disam = instruction.ToString();
-            foreach (Operand op in instruction.operand)
+            foreach (var op in instruction.operand)
             {
                 if (op.type == null)
                 {

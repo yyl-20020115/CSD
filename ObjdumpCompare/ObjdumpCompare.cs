@@ -113,7 +113,7 @@ public static class ObjdumpCompare
                 {
                     if (instruction.op == ("invalid"))
                     {
-                        string opname = objdump[..objdump.IndexOf(' ')];
+                        var opname = objdump[..objdump.IndexOf(' ')];
                         if (!invalid.ContainsKey(opname))
                         {
                             invalid.Add(opname, x86Bytes + " " + objdump);
