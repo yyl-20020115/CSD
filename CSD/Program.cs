@@ -11,12 +11,12 @@ public static class Program
         }
         else if (args.Length == 2)
         {
-            if (File.Exists(args[0]) && File.Exists(args[1]))
+            if (File.Exists(args[0]))
             {
                 var data = File.ReadAllBytes(args[0]);
                 var input = new ReversibleStream(data);
                 int mode = 16;
-                int index = 0;
+                long index = 0;
                 using var writer = new StreamWriter(args[1]);
                 while (true)
                 {
@@ -24,35 +24,32 @@ public static class Program
                     try
                     {
                         instruction = Dissassembler.Decode(input, mode);
+                        if (instruction.op == ("invalid"))
+                        {
+                            break;
+                        }
+                        writer.WriteLine($"{index:X8}\t{instruction.ToString()}");
+                        index += instruction.x86Length;
+
+                        if (instruction.zygote.op == "jmp")
+                        {
+                            var target = instruction.operand[0].lval + instruction.x86Length;
+                            input.index = target;
+                        }
+
+                        if (index == data.Length)
+                            break;
                     }
                     catch (InvalidOperationException e)
                     {
-                        index = Advance(index, data);
-                        if (index == -1)
-                            break;
-                        continue;
+                        break;
                     }
                     catch (IndexOutOfRangeException e)
                     {
-                        --index;
-                        if ((index == 0) && (data[0] == 0xff))
-                            break;
-                        ++data[index];
-                        for (int i = index + 1; i < data.Length; i++)
-                            data[i] = 0;
-                        continue;
+                        break;
                     }
-                    if (instruction.op == ("invalid"))
-                    {
-                        index = Advance(index, data);
-                        if (index == -1)
-                            break;
-                        continue;
-                    }
-                    writer.WriteLine(instruction.ToString());
-
+                   
                 }
-                return 0;
             }
         }
         return 0;

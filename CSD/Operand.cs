@@ -4,7 +4,7 @@ namespace CSD;
 
 public class Operand
 {
-    public int x86Length;
+    public long x86Length;
     public Instruction parent;
     public long eip;
     public String seg;

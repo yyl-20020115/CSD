@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "CSD": {
+      "commandName": "Project",
+      "commandLineArgs": "ASM240.COM ASMTEXT.ASM",
+      "workingDirectory": "D:\\Working\\SASM"
+    }
+  }
+}

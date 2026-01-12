@@ -5,9 +5,9 @@ public class ReversibleStream(byte[] data)
     public static implicit operator ReversibleStream(byte[] data) 
         => new(data);
     public readonly byte[] data = data;
-    public int index = 0;
+    public long index = 0;
     public void Reset() => index = 0;
-    public int Counter => index;
+    public long Counter => index;
     public long Read(long bits) => bits switch
     {
         8 => data[index++],

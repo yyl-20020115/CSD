@@ -53,14 +53,14 @@ public class Instruction
     /*input;
       mode;
       add;*/
-    public int x86Length;
+    public long x86Length;
     public long eip;
-    public ZygoteInstruction zygote;
+    public ZygoteInstruction? zygote;
     public string op = "invalid";
     public Operand[] operand = [];
     public Prefix pfx = new();
     public int opr_mode, adr_mode;
-    public string branch_dist;
+    public string? branch_dist;
 
     public Instruction()
     {
