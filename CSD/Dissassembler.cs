@@ -16,9 +16,9 @@ public static class Dissassembler
         GetPrefixes(mode, input, instruction);
         SearchTable(mode, input, instruction);
         DoMode(mode, input, instruction);
-        DisasmOperands(mode, input, instruction);
+        DisassembleOperands(mode, input, instruction);
         ResolveOperator(mode, input, instruction);
-        instruction.x86Length = input.Counter;
+        instruction.Length = input.Counter;
         return instruction;
     }
 
@@ -325,7 +325,7 @@ public static class Dissassembler
             throw new InvalidOperationException("SWAPGS only valid in 64 bit mode");
     }
 
-    private static void DisasmOperands(int mode, ReversibleStream input, Instruction inst)
+    private static void DisassembleOperands(int mode, ReversibleStream input, Instruction inst)
     {
         // get type
         var mopt = new int[inst.zygote.operand.Length];
@@ -919,11 +919,11 @@ public static class Dissassembler
         return inst.operand_mode == 16 ? GPR[("16")][(index)] : GPR[("32")][(index)];
     }
 
-    private static string ResolveGpr64(int mode, Instruction inst, int gpr_op)
+    private static string? ResolveGpr64(int mode, Instruction inst, int gpr_op)
     {
         int index = (OP_rAXr8 <= gpr_op) && (OP_rDIr15 >= gpr_op) ? (gpr_op - OP_rAXr8) | (REX_B(inst.prefix.rex) << 3) : gpr_op - OP_rAX;
         return inst.operand_mode == 16
-            ? GPR[("16")][(index)]
+            ? GPR[("16")]?[(index)]
             : (mode == 32) || !((inst.operand_mode == 32) && (REX_W(inst.prefix.rex) == 0)) ? GPR[("32")][index] : GPR[("64")][(index)];
     }
 
@@ -948,6 +948,6 @@ public static class Dissassembler
             && (inst.prefix.rex != 0) ? rm >= 4 ? GPR[("8")][(rm + 4)] : GPR[("8")][(rm)] : GPR[("8")][(rm)] : null;
     }
 
-    private static string ResolveReg(string regtype, int i) 
-        => GPR[regtype][i];
+    private static string? ResolveReg(string regtype, int i) 
+        => GPR[regtype]?[i];
 }

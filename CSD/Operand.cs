@@ -4,15 +4,15 @@ namespace CSD;
 
 public class Operand
 {
-    public long x86Length;
+    public long Length;
     public Instruction? parent;
     public long eip;
-    public String? seg;
-    public String? type, _base;
+    public string? seg;
+    public string? type, _base;
     public int size;
     public long lval;
     public Pointer? ptr; // should be same as lval somehow
-    public String? index;
+    public string? index;
     public long offset, scale;
     public int cast;
     //long pc;
@@ -23,7 +23,7 @@ public class Operand
     public int imm_start, dis_start;
 
     public override string ToString() => ToString(false);
-    public  string ToString(bool pattern = false)
+    public string? ToString(bool pattern = false)
     {
         if (type == null)
             return "UNKNOWN - AVX?";
@@ -106,10 +106,10 @@ public class Operand
         {
             if (!pattern)
             {
-                if (eip + x86Length + lval < 0)
-                    builder.Append($"0x{(eip + x86Length + lval) & ((1L << maxSize) - 1):X}");
+                if (eip + Length + lval < 0)
+                    builder.Append($"0x{(eip + Length + lval) & ((1L << maxSize) - 1):X}");
                 else
-                    builder.Append($"0x{eip + x86Length + lval:X}");
+                    builder.Append($"0x{eip + Length + lval:X}");
             }
             else
             {
@@ -126,6 +126,6 @@ public class Operand
                 builder.Append("$SSSS:$DDDDDDDD");
         }
         return builder.ToString();
-        //return String.format("[%s %s %s %d %x %x %x]", type, @base, index, size, lval, offset, scale);
+        //return string.format("[%s %s %s %d %x %x %x]", type, @base, index, size, lval, offset, scale);
     }
 }

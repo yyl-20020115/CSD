@@ -29,11 +29,11 @@ public static class Program
                             break;
                         }
                         writer.WriteLine($"{index:X8}\t{instruction.ToString()}");
-                        index += instruction.x86Length;
+                        index += instruction.Length;
 
                         if (instruction.zygote.opcode == "jmp")
                         {
-                            var target = instruction.operand[0].lval + instruction.x86Length;
+                            var target = instruction.operand[0].lval + instruction.Length;
                             input.index = target;
                         }
 

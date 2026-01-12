@@ -53,7 +53,7 @@ public class Instruction
     /*input;
       mode;
       add;*/
-    public long x86Length;
+    public long Length;
     public long eip;
     public ZygoteInstruction? zygote;
     public string opcode = "invalid";
@@ -88,7 +88,7 @@ public class Instruction
             if (op.size > maxSize)
                 maxSize = op.size;
             op.eip = eip;
-            op.x86Length = x86Length;
+            op.Length = Length;
         }
         foreach (var op in operand)
             op.maxSize = maxSize;
@@ -96,10 +96,10 @@ public class Instruction
         return WithSize
             ? operand.Length switch
             {
-                1 => $"({x86Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
-                2 => $"({x86Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}",
-                3 => $"({x86Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}, {operand[2]}",
-                _ => $"({x86Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)}",
+                1 => $"({Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
+                2 => $"({Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}",
+                3 => $"({Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}, {operand[2]}",
+                _ => $"({Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)}",
             }
             : operand.Length switch
             {

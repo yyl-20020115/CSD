@@ -73,7 +73,7 @@ public static class PatternGenerator
                 continue;
             }
             var pattern = new StringBuilder();
-            for (int c = 0; c < instruction.x86Length; c++)
+            for (int c = 0; c < instruction.Length; c++)
                 pattern.Append($"{data[c] & 0xFF:X2}");
             // mask out with DD and II
             var disam = instruction.ToString();
