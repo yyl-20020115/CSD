@@ -31,7 +31,7 @@ public static class Program
                         writer.WriteLine($"{index:X8}\t{instruction.ToString()}");
                         index += instruction.Length;
 
-                        if (instruction.zygote.opcode == "jmp")
+                        if (instruction.template.opcode == "jmp")
                         {
                             var target = instruction.operand[0].lval + instruction.Length;
                             input.index = target;

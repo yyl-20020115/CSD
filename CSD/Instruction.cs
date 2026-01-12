@@ -55,7 +55,7 @@ public class Instruction
       add;*/
     public long Length;
     public long eip;
-    public ZygoteInstruction? zygote;
+    public TemplateInstruction? template;
     public string opcode = "invalid";
     public Operand[] operand = [];
     public Prefix prefix = new();

@@ -4,11 +4,11 @@ using static TemplateOperand;
 using static Table;
 public static class Dissassembler
 {
-    public static readonly ZygoteInstruction[][] itab = Table.itab_list;
+    public static readonly TemplateInstruction[][] itab = Table.itab_list;
     public static readonly int vendor = VENDOR_INTEL;
-    public static readonly ZygoteInstruction ie_invalid = new("invalid", O_NONE, O_NONE, O_NONE, P_none);
-    public static readonly ZygoteInstruction ie_pause = new("pause", O_NONE, O_NONE, O_NONE, P_none);
-    public static readonly ZygoteInstruction ie_nop = new("nop", O_NONE, O_NONE, O_NONE, P_none);
+    public static readonly TemplateInstruction ie_invalid = new("invalid", O_NONE, O_NONE, O_NONE, P_none);
+    public static readonly TemplateInstruction ie_pause = new("pause", O_NONE, O_NONE, O_NONE, P_none);
+    public static readonly TemplateInstruction ie_nop = new("nop", O_NONE, O_NONE, O_NONE, P_none);
     
     public static Instruction Decode(ReversibleStream input, int mode)
     {
@@ -115,7 +115,7 @@ public static class Dissassembler
         switch (mode)
         {
             case 64:
-                inst.operand_mode = REX_W(inst.prefix.rex) != 0 ? 64 : inst.prefix.opr != 0 ? 16 : P_DEF64(inst.zygote.prefix) != 0 ? 64 : 32;
+                inst.operand_mode = REX_W(inst.prefix.rex) != 0 ? 64 : inst.prefix.opr != 0 ? 16 : P_DEF64(inst.template.prefix) != 0 ? 64 : 32;
                 inst.address_mode = inst.prefix.adr != 0 ? 32 : 64;
                 break;
             case 32:
@@ -137,7 +137,7 @@ public static class Dissassembler
         input.Forward();
 
         int table = 0;
-        ZygoteInstruction e;
+        TemplateInstruction e;
 
         // resolve xchg, nop, pause crazyness
         if (0x90 == curr)
@@ -151,8 +151,8 @@ public static class Dissassembler
                 }
                 else
                     e = ie_nop;
-                inst.zygote = e;
-                inst.opcode = inst.zygote.opcode;
+                inst.template = e;
+                inst.opcode = inst.template.opcode;
                 return;
             }
         }
@@ -204,7 +204,7 @@ public static class Dissassembler
                 if (e.opcode==("invalid"))
                     if (did_peek)
                         input.Forward();
-                inst.zygote = e;
+                inst.template = e;
                 inst.opcode = e.opcode;
                 return;
             }
@@ -268,16 +268,16 @@ public static class Dissassembler
         {
             case 64:
                 // Check validity of  instruction m64 
-                if (P_INV64(inst.zygote.prefix) != 0)
+                if (P_INV64(inst.template.prefix) != 0)
                     throw new InvalidOperationException("Invalid instruction");
 
                 // effective rex prefix is the  effective mask for the 
                 // instruction hard-coded in the opcode map.
                 inst.prefix.rex = inst.prefix.rex & 0x40
-                                | inst.prefix.rex & REX_PFX_MASK(inst.zygote.prefix);
+                                | inst.prefix.rex & REX_PFX_MASK(inst.template.prefix);
 
                 // calculate effective operand size 
-                inst.operand_mode = REX_W(inst.prefix.rex) != 0 || P_DEF64(inst.zygote.prefix) != 0 ? 64 : inst.prefix.opr != 0 ? 16 : 32;
+                inst.operand_mode = REX_W(inst.prefix.rex) != 0 || P_DEF64(inst.template.prefix) != 0 ? 64 : inst.prefix.opr != 0 ? 16 : 32;
 
                 // calculate effective address size
                 inst.address_mode = inst.prefix.adr != 0 ? 32 : 64;
@@ -328,13 +328,13 @@ public static class Dissassembler
     private static void DisassembleOperands(int mode, ReversibleStream input, Instruction inst)
     {
         // get type
-        var mopt = new int[inst.zygote.operand.Length];
+        var mopt = new int[inst.template.operand.Length];
         for (int i = 0; i < mopt.Length; i++)
-            mopt[i] = inst.zygote.operand[i].type;
+            mopt[i] = inst.template.operand[i].type;
         // get size
-        var mops = new int[inst.zygote.operand.Length];
+        var mops = new int[inst.template.operand.Length];
         for (int i = 0; i < mops.Length; i++)
-            mops[i] = inst.zygote.operand[i].size;
+            mops[i] = inst.template.operand[i].size;
 
         if (mopt[2] != OP_NONE)
             inst.operand = [new Operand(), new Operand(), new Operand()];
@@ -346,11 +346,11 @@ public static class Dissassembler
         // These flags determine which operand to apply the operand size
         // cast to.
         if (inst.operand.Length > 0)
-            inst.operand[0].cast = P_C0(inst.zygote.prefix);
+            inst.operand[0].cast = P_C0(inst.template.prefix);
         if (inst.operand.Length > 1)
-            inst.operand[1].cast = P_C1(inst.zygote.prefix);
+            inst.operand[1].cast = P_C1(inst.template.prefix);
         if (inst.operand.Length > 2)
-            inst.operand[2].cast = P_C2(inst.zygote.prefix);
+            inst.operand[2].cast = P_C2(inst.template.prefix);
 
         // iop = instruction operand 
         //iop = inst.operand
