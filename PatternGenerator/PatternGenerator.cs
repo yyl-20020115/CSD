@@ -65,7 +65,7 @@ public static class PatternGenerator
                     data[i] = 0;
                 continue;
             }
-            if (instruction.op == ("invalid"))
+            if (instruction.opcode == ("invalid"))
             {
                 index = Advance(index, data);
                 if (index == -1)

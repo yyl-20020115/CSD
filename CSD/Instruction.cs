@@ -56,19 +56,17 @@ public class Instruction
     public long x86Length;
     public long eip;
     public ZygoteInstruction? zygote;
-    public string op = "invalid";
+    public string opcode = "invalid";
     public Operand[] operand = [];
-    public Prefix pfx = new();
-    public int opr_mode, adr_mode;
+    public Prefix prefix = new();
+    public int operand_mode, address_mode;
     public string? branch_dist;
 
-    public Instruction()
-    {
-    }
+    public Instruction() { }
 
-    public static readonly List<string> sign_extends = ["cmp", "or", "imul", "adc", "sbb", "xor"];
+    public static readonly List<string> SignExtends = ["cmp", "or", "imul", "adc", "sbb", "xor"];
 
-    public static string intel_size(int size) => size switch
+    public static string IntelModeSize(int size) => size switch
     {
         0 => "",//XMMWORD PTR ";
         8 => "BYTE PTR ",
@@ -81,7 +79,7 @@ public class Instruction
 
 
     public override string ToString() => ToString(false);
-    public string ToString(bool print_size = false)
+    public string ToString(bool WithSize = false)
     {
         int maxSize = 0;
         foreach (var op in operand)
@@ -95,20 +93,20 @@ public class Instruction
         foreach (var op in operand)
             op.maxSize = maxSize;
 
-        return print_size
+        return WithSize
             ? operand.Length switch
             {
-                1 => $"({x86Length} bytes) {pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
-                2 => $"({x86Length} bytes) {pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}",
-                3 => $"({x86Length} bytes) {pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}, {operand[2]}",
-                _ => $"({x86Length} bytes) {pfx}{op + (branch_dist == null ? "" : " " + branch_dist)}",
+                1 => $"({x86Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
+                2 => $"({x86Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}",
+                3 => $"({x86Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}, {operand[2]}",
+                _ => $"({x86Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)}",
             }
             : operand.Length switch
             {
-                1 => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
-                2 => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]},{operand[1]}",
-                3 => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]},{operand[1]},{operand[2]}",
-                _ => $"{pfx}{op + (branch_dist == null ? "" : " " + branch_dist)}",
+                1 => $"{prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
+                2 => $"{prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]},{operand[1]}",
+                3 => $"{prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]},{operand[1]},{operand[2]}",
+                _ => $"{prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)}",
             };
     }
 }

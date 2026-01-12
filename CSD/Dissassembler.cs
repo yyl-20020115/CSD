@@ -33,70 +33,70 @@ public static class Dissassembler
             i++;
 
             if ((mode == 64) && ((curr & 0xF0) == 0x40))
-                inst.pfx.rex = curr;
+                inst.prefix.rex = curr;
             else
             {
                 if (curr == 0x2E)
                 {
-                    inst.pfx.seg = "cs";
-                    inst.pfx.rex = 0;
+                    inst.prefix.seg = "cs";
+                    inst.prefix.rex = 0;
                 }
                 else if (curr == 0x36)
                 {
-                    inst.pfx.seg = "ss";
-                    inst.pfx.rex = 0;
+                    inst.prefix.seg = "ss";
+                    inst.prefix.rex = 0;
                 }
                 else if (curr == 0x3E)
                 {
-                    inst.pfx.seg = "ds";
-                    inst.pfx.rex = 0;
+                    inst.prefix.seg = "ds";
+                    inst.prefix.rex = 0;
                 }
                 else if (curr == 0x26)
                 {
-                    inst.pfx.seg = "es";
-                    inst.pfx.rex = 0;
+                    inst.prefix.seg = "es";
+                    inst.prefix.rex = 0;
                 }
                 else if (curr == 0x64)
                 {
-                    inst.pfx.seg = "fs";
-                    inst.pfx.rex = 0;
+                    inst.prefix.seg = "fs";
+                    inst.prefix.rex = 0;
                 }
                 else if (curr == 0x65)
                 {
-                    inst.pfx.seg = "gs";
-                    inst.pfx.rex = 0;
+                    inst.prefix.seg = "gs";
+                    inst.prefix.rex = 0;
                 }
                 else if (curr == 0x67) //adress-size override prefix
                 {
-                    inst.pfx.adr = 0x67;
-                    inst.pfx.rex = 0;
+                    inst.prefix.adr = 0x67;
+                    inst.prefix.rex = 0;
                 }
                 else if (curr == 0xF0)
                 {
-                    inst.pfx._lock = 0xF0;
-                    inst.pfx.rex = 0;
+                    inst.prefix._lock = 0xF0;
+                    inst.prefix.rex = 0;
                 }
                 else if (curr == 0x66)
                 {
                     // the 0x66 sse prefix is only effective if no other sse prefix
                     // has already been specified.
-                    if (inst.pfx.insn == 0)
-                        inst.pfx.insn = 0x66;
-                    inst.pfx.opr = 0x66;
-                    inst.pfx.rex = 0;
+                    if (inst.prefix.insn == 0)
+                        inst.prefix.insn = 0x66;
+                    inst.prefix.opr = 0x66;
+                    inst.prefix.rex = 0;
                 }
                 else if (curr == 0xF2)
                 {
-                    inst.pfx.insn = 0xF2;
-                    inst.pfx.repne = 0xF2;
-                    inst.pfx.rex = 0;
+                    inst.prefix.insn = 0xF2;
+                    inst.prefix.repne = 0xF2;
+                    inst.prefix.rex = 0;
                 }
                 else if (curr == 0xF3)
                 {
-                    inst.pfx.insn = 0xF3;
-                    inst.pfx.rep = 0xF3;
-                    inst.pfx.repe = 0xF3;
-                    inst.pfx.rex = 0;
+                    inst.prefix.insn = 0xF3;
+                    inst.prefix.rep = 0xF3;
+                    inst.prefix.repe = 0xF3;
+                    inst.prefix.rex = 0;
                 }
                 else
                     //No more prefixes
@@ -115,16 +115,16 @@ public static class Dissassembler
         switch (mode)
         {
             case 64:
-                inst.opr_mode = REX_W(inst.pfx.rex) != 0 ? 64 : inst.pfx.opr != 0 ? 16 : P_DEF64(inst.zygote.prefix) != 0 ? 64 : 32;
-                inst.adr_mode = inst.pfx.adr != 0 ? 32 : 64;
+                inst.operand_mode = REX_W(inst.prefix.rex) != 0 ? 64 : inst.prefix.opr != 0 ? 16 : P_DEF64(inst.zygote.prefix) != 0 ? 64 : 32;
+                inst.address_mode = inst.prefix.adr != 0 ? 32 : 64;
                 break;
             case 32:
-                inst.opr_mode = inst.pfx.opr != 0 ? 16 : 32;
-                inst.adr_mode = inst.pfx.adr != 0 ? 16 : 32;
+                inst.operand_mode = inst.prefix.opr != 0 ? 16 : 32;
+                inst.address_mode = inst.prefix.adr != 0 ? 16 : 32;
                 break;
             case 16:
-                inst.opr_mode = inst.pfx.opr != 0 ? 32 : 16;
-                inst.adr_mode = inst.pfx.adr != 0 ? 32 : 16;
+                inst.operand_mode = inst.prefix.opr != 0 ? 32 : 16;
+                inst.address_mode = inst.prefix.adr != 0 ? 32 : 16;
                 break;
         }
     }
@@ -142,17 +142,17 @@ public static class Dissassembler
         // resolve xchg, nop, pause crazyness
         if (0x90 == curr)
         {
-            if (!((mode == 64) && (REX_B(inst.pfx.rex) != 0)))
+            if (!((mode == 64) && (REX_B(inst.prefix.rex) != 0)))
             {
-                if (inst.pfx.rep != 0)
+                if (inst.prefix.rep != 0)
                 {
-                    inst.pfx.rep = 0;
+                    inst.prefix.rep = 0;
                     e = ie_pause;
                 }
                 else
                     e = ie_nop;
                 inst.zygote = e;
-                inst.op = inst.zygote.op;
+                inst.opcode = inst.zygote.opcode;
                 return;
             }
         }
@@ -163,29 +163,29 @@ public static class Dissassembler
             input.Forward();
 
             // 2byte opcodes can be modified by 0x66, F3, and F2 prefixes
-            if (0x66 == inst.pfx.insn)
+            if (0x66 == inst.prefix.insn)
             {
-                if (itab[ITAB__PFX_SSE66__0F][curr].op!=("invalid"))
+                if (itab[ITAB__PFX_SSE66__0F][curr].opcode!=("invalid"))
                 {
                     table = ITAB__PFX_SSE66__0F;
                     //inst.pfx.opr = 0;
                 }
             }
-            else if (0xF2 == inst.pfx.insn)
+            else if (0xF2 == inst.prefix.insn)
             {
-                if (itab[ITAB__PFX_SSEF2__0F][curr].op!=("invalid"))
+                if (itab[ITAB__PFX_SSEF2__0F][curr].opcode!=("invalid"))
                 {
                     table = ITAB__PFX_SSEF2__0F;
-                    inst.pfx.repne = 0;
+                    inst.prefix.repne = 0;
                 }
             }
-            else if (0xF3 == inst.pfx.insn)
+            else if (0xF3 == inst.prefix.insn)
             {
-                if (itab[ITAB__PFX_SSEF3__0F][curr].op!=("invalid"))
+                if (itab[ITAB__PFX_SSEF3__0F][curr].opcode!=("invalid"))
                 {
                     table = ITAB__PFX_SSEF3__0F;
-                    inst.pfx.repe = 0;
-                    inst.pfx.rep = 0;
+                    inst.prefix.repe = 0;
+                    inst.prefix.rep = 0;
                 }
             }
         }
@@ -199,19 +199,19 @@ public static class Dissassembler
             e = itab[table][index];
             // if @operator constant is a standard instruction constant
             // our search is over.
-            if (ops.Contains(e.op))
+            if (ops.Contains(e.opcode))
             {
-                if (e.op==("invalid"))
+                if (e.opcode==("invalid"))
                     if (did_peek)
                         input.Forward();
                 inst.zygote = e;
-                inst.op = e.op;
+                inst.opcode = e.opcode;
                 return;
             }
 
             table = e.prefix;
 
-            switch (e.op)
+            switch (e.opcode)
             {
                 case "grp_reg":
                     peek = input.Current;
@@ -237,10 +237,10 @@ public static class Dissassembler
                     index = curr - 0xC0;
                     break;
                 case "grp_osize":
-                    index = inst.opr_mode == 64 ? ITAB__MODE_INDX__64 : inst.opr_mode == 32 ? ITAB__MODE_INDX__32 : ITAB__MODE_INDX__16;
+                    index = inst.operand_mode == 64 ? ITAB__MODE_INDX__64 : inst.operand_mode == 32 ? ITAB__MODE_INDX__32 : ITAB__MODE_INDX__16;
                     break;
                 case "grp_asize":
-                    index = inst.adr_mode == 64 ? ITAB__MODE_INDX__64 : inst.adr_mode == 32 ? ITAB__MODE_INDX__32 : ITAB__MODE_INDX__16;
+                    index = inst.address_mode == 64 ? ITAB__MODE_INDX__64 : inst.address_mode == 32 ? ITAB__MODE_INDX__32 : ITAB__MODE_INDX__16;
                     break;
                 case "grp_mode":
                     index = mode == 64 ? ITAB__MODE_INDX__64 : mode == 32 ? ITAB__MODE_INDX__32 : ITAB__MODE_INDX__16;
@@ -273,22 +273,22 @@ public static class Dissassembler
 
                 // effective rex prefix is the  effective mask for the 
                 // instruction hard-coded in the opcode map.
-                inst.pfx.rex = inst.pfx.rex & 0x40
-                                | inst.pfx.rex & REX_PFX_MASK(inst.zygote.prefix);
+                inst.prefix.rex = inst.prefix.rex & 0x40
+                                | inst.prefix.rex & REX_PFX_MASK(inst.zygote.prefix);
 
                 // calculate effective operand size 
-                inst.opr_mode = REX_W(inst.pfx.rex) != 0 || P_DEF64(inst.zygote.prefix) != 0 ? 64 : inst.pfx.opr != 0 ? 16 : 32;
+                inst.operand_mode = REX_W(inst.prefix.rex) != 0 || P_DEF64(inst.zygote.prefix) != 0 ? 64 : inst.prefix.opr != 0 ? 16 : 32;
 
                 // calculate effective address size
-                inst.adr_mode = inst.pfx.adr != 0 ? 32 : 64;
+                inst.address_mode = inst.prefix.adr != 0 ? 32 : 64;
                 break;
             case 32:
-                inst.opr_mode = inst.pfx.opr != 0 ? 16 : 32;
-                inst.adr_mode = inst.pfx.adr != 0 ? 16 : 32;
+                inst.operand_mode = inst.prefix.opr != 0 ? 16 : 32;
+                inst.address_mode = inst.prefix.adr != 0 ? 16 : 32;
                 break;
             case 16:
-                inst.opr_mode = inst.pfx.opr != 0 ? 32 : 16;
-                inst.adr_mode = inst.pfx.adr != 0 ? 32 : 16;
+                inst.operand_mode = inst.prefix.opr != 0 ? 32 : 16;
+                inst.address_mode = inst.prefix.adr != 0 ? 32 : 16;
                 break;
         }
     }
@@ -298,7 +298,7 @@ public static class Dissassembler
         // far/near flags 
         inst.branch_dist = null;
         // readjust operand sizes for call/jmp instrcutions 
-        if (inst.op==("call") || inst.op==("jmp"))
+        if (inst.opcode==("call") || inst.opcode==("jmp"))
         {
             if (inst.operand[0].size == SZ_WP)
             {
@@ -315,13 +315,13 @@ public static class Dissassembler
             else if (inst.operand[0].size == 8)
                 inst.branch_dist = "near";
         }
-        else if (inst.op==("3dnow"))
+        else if (inst.opcode==("3dnow"))
         {
             // resolve 3dnow weirdness 
-            inst.op = itab[ITAB__3DNOW][input.Current].op;
+            inst.opcode = itab[ITAB__3DNOW][input.Current].opcode;
         }
         // SWAPGS is only valid in 64bits mode
-        if ((inst.op==("swapgs")) && (mode != 64))
+        if ((inst.opcode==("swapgs")) && (mode != 64))
             throw new InvalidOperationException("SWAPGS only valid in 64 bit mode");
     }
 
@@ -468,7 +468,7 @@ public static class Dissassembler
         }
         else if (ops3.Contains(mopt[0]))
         {
-            int gpr = (mopt[0] - OP_ALr8b + (REX_B(inst.pfx.rex) << 3));
+            int gpr = (mopt[0] - OP_ALr8b + (REX_B(inst.prefix.rex) << 3));
             /*if ((gpr in ["ah",	"ch",	"dh",	"bh",
               "spl",	"bpl",	"sil",	"dil",
               "r8b",	"r9b",	"r10b",	"r11b",
@@ -588,10 +588,10 @@ public static class Dissassembler
                 // special cases for movlps and movhps 
                 if (MODRM_MOD(input.Current) == 3)
                 {
-                    if (inst.op==("movlps"))
-                        inst.op = "movhlps";
-                    else if (inst.op==("movhps"))
-                        inst.op = "movlhps";
+                    if (inst.opcode==("movlps"))
+                        inst.opcode = "movhlps";
+                    else if (inst.opcode==("movhps"))
+                        inst.opcode = "movlhps";
                 }
                 DecodeModRm(mode, inst, input, inst.operand[1], mops[1], "T_XMM", inst.operand[0], mops[0], "T_XMM");
                 if (mopt[2] == OP_I)
@@ -696,7 +696,7 @@ public static class Dissassembler
     private static void DecodeA(int mode, Instruction inst, ReversibleStream input, Operand op)
     {
         //Decodes operands of the type seg:offset.
-        if (inst.opr_mode == 16)
+        if (inst.operand_mode == 16)
         {
             // seg16:off16 
             op.type = "OP_PTR";
@@ -718,8 +718,8 @@ public static class Dissassembler
     {
         // get mod, r/m and reg fields
         int mod = MODRM_MOD(input.Current);
-        int rm = (REX_B(inst.pfx.rex) << 3) | MODRM_RM(input.Current);
-        int reg = (REX_R(inst.pfx.rex) << 3) | MODRM_REG(input.Current);
+        int rm = (REX_B(inst.prefix.rex) << 3) | MODRM_RM(input.Current);
+        int reg = (REX_R(inst.prefix.rex) << 3) | MODRM_REG(input.Current);
 
         if (reg_type==("T_DBG") || reg_type==("T_CRG")) // force these to be reg ops (mod is ignored)
             mod = 3;
@@ -730,15 +730,15 @@ public static class Dissassembler
         if (mod == 3)
         {
             op.type = "OP_REG";
-            op._base = rm_type == "T_GPR" ? DecodeGpr(mode, inst, op.size, rm) : ResolveReg(rm_type, (REX_B(inst.pfx.rex) << 3) | (rm & 7));
+            op._base = rm_type == "T_GPR" ? DecodeGpr(mode, inst, op.size, rm) : ResolveReg(rm_type, (REX_B(inst.prefix.rex) << 3) | (rm & 7));
         }
         // else its memory addressing 
         else
         {
             op.type = "OP_MEM";
-            op.seg = inst.pfx.seg;
+            op.seg = inst.prefix.seg;
             // 64bit addressing 
-            if (inst.adr_mode == 64)
+            if (inst.address_mode == 64)
             {
                 op._base = GPR[("64")][(rm)];
 
@@ -761,8 +761,8 @@ public static class Dissassembler
                     input.Forward();
 
                     op.scale = (1 << SIB_S(input.Current)) & ~1;
-                    op.index = GPR[("64")][((SIB_I(input.Current) | (REX_X(inst.pfx.rex) << 3)))];
-                    op._base = GPR[("64")][((SIB_B(input.Current) | (REX_B(inst.pfx.rex) << 3)))];
+                    op.index = GPR[("64")][((SIB_I(input.Current) | (REX_X(inst.prefix.rex) << 3)))];
+                    op._base = GPR[("64")][((SIB_B(input.Current) | (REX_B(inst.prefix.rex) << 3)))];
 
                     // special conditions for @base reference
                     if (op.index==("rsp"))
@@ -783,7 +783,7 @@ public static class Dissassembler
                 }
             }
             // 32-Bit addressing mode 
-            else if (inst.adr_mode == 32)
+            else if (inst.address_mode == 32)
             {
                 // get @base 
                 op._base = GPR[("32")][(rm)];
@@ -807,8 +807,8 @@ public static class Dissassembler
                     input.Forward();
 
                     op.scale = (1 << SIB_S(input.Current)) & ~1;
-                    op.index = GPR[("32")][(SIB_I(input.Current) | (REX_X(inst.pfx.rex) << 3))];
-                    op._base = GPR[("32")][(SIB_B(input.Current) | (REX_B(inst.pfx.rex) << 3))];
+                    op.index = GPR[("32")][(SIB_I(input.Current) | (REX_X(inst.prefix.rex) << 3))];
+                    op._base = GPR[("32")][(SIB_B(input.Current) | (REX_B(inst.prefix.rex) << 3))];
 
                     if (op.index==("esp"))
                     {
@@ -905,10 +905,10 @@ public static class Dissassembler
     private static void DecodeO(int mode, Instruction inst, ReversibleStream input, int s, Operand op)
     {
         // offset
-        op.seg = inst.pfx.seg;
-        op.offset = inst.adr_mode;
+        op.seg = inst.prefix.seg;
+        op.offset = inst.address_mode;
         op.dis_start = (int)input.Counter;
-        op.lval = input.Read(inst.adr_mode);
+        op.lval = input.Read(inst.address_mode);
         op.type = "OP_MEM";
         op.size = ResolveOperandSize(mode, inst, s);
     }
@@ -916,24 +916,24 @@ public static class Dissassembler
     private static string ResolveGpr32(Instruction inst, int gpr_op)
     {
         int index = gpr_op - OP_eAX;
-        return inst.opr_mode == 16 ? GPR[("16")][(index)] : GPR[("32")][(index)];
+        return inst.operand_mode == 16 ? GPR[("16")][(index)] : GPR[("32")][(index)];
     }
 
     private static string ResolveGpr64(int mode, Instruction inst, int gpr_op)
     {
-        int index = (OP_rAXr8 <= gpr_op) && (OP_rDIr15 >= gpr_op) ? (gpr_op - OP_rAXr8) | (REX_B(inst.pfx.rex) << 3) : gpr_op - OP_rAX;
-        return inst.opr_mode == 16
+        int index = (OP_rAXr8 <= gpr_op) && (OP_rDIr15 >= gpr_op) ? (gpr_op - OP_rAXr8) | (REX_B(inst.prefix.rex) << 3) : gpr_op - OP_rAX;
+        return inst.operand_mode == 16
             ? GPR[("16")][(index)]
-            : (mode == 32) || !((inst.opr_mode == 32) && (REX_W(inst.pfx.rex) == 0)) ? GPR[("32")][index] : GPR[("64")][(index)];
+            : (mode == 32) || !((inst.operand_mode == 32) && (REX_W(inst.prefix.rex) == 0)) ? GPR[("32")][index] : GPR[("64")][(index)];
     }
 
     private static int ResolveOperandSize(int mode, Instruction inst, int s) => s == SZ_V
-            ? inst.opr_mode
+            ? inst.operand_mode
             : s == SZ_Z
-            ? inst.opr_mode == 16 ? 16 : 32
+            ? inst.operand_mode == 16 ? 16 : 32
             : s == SZ_P
-            ? inst.opr_mode == 16 ? SZ_WP : SZ_DP
-            : s == SZ_MDQ ? inst.opr_mode == 16 ? 32 : inst.opr_mode : s == SZ_RDQ ? mode == 64 ? 64 : 32 : s;
+            ? inst.operand_mode == 16 ? SZ_WP : SZ_DP
+            : s == SZ_MDQ ? inst.operand_mode == 16 ? 32 : inst.operand_mode : s == SZ_RDQ ? mode == 64 ? 64 : 32 : s;
 
     private static string DecodeGpr(int mode, Instruction inst, int s, int rm)
     {
@@ -945,7 +945,7 @@ public static class Dissassembler
             : (s == SZ_WP) || (s == 16)
             ? GPR[("16")][(rm)]
             : s == 8 ? (mode == 64) 
-            && (inst.pfx.rex != 0) ? rm >= 4 ? GPR[("8")][(rm + 4)] : GPR[("8")][(rm)] : GPR[("8")][(rm)] : null;
+            && (inst.prefix.rex != 0) ? rm >= 4 ? GPR[("8")][(rm + 4)] : GPR[("8")][(rm)] : GPR[("8")][(rm)] : null;
     }
 
     private static string ResolveReg(string regtype, int i) 

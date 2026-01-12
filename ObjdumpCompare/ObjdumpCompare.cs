@@ -111,7 +111,7 @@ public static class ObjdumpCompare
                 }
                 try
                 {
-                    if (instruction.op == ("invalid"))
+                    if (instruction.opcode == ("invalid"))
                     {
                         var opname = objdump[..objdump.IndexOf(' ')];
                         if (!invalid.ContainsKey(opname))
@@ -121,8 +121,8 @@ public static class ObjdumpCompare
                         }
                         continue;
                     }
-                    if ((instruction.op != "nop") || (!objdump.Contains("xchg")))
-                        if (!excludes.Contains(instruction.op))
+                    if ((instruction.opcode != "nop") || (!objdump.Contains("xchg")))
+                        if (!excludes.Contains(instruction.opcode))
                             if (instruction.ToString().Replace("near ", "").Replace("0x", "").Replace("DWORD PTR ", "")!=(objdump.Replace("0x", "")))
                                 Console.WriteLine(x86Bytes + " -> " + instruction + " != " + objdump);
                 }

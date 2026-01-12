@@ -3,7 +3,6 @@ namespace CSD;
 using static TemplateOperand;
 public class Table
 {
-
     public static readonly int ITAB__VENDOR_INDX__AMD = 0;
     public static readonly int ITAB__VENDOR_INDX__INTEL = 1;
 

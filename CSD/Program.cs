@@ -24,14 +24,14 @@ public static class Program
                     try
                     {
                         instruction = Dissassembler.Decode(input, mode);
-                        if (instruction.op == ("invalid"))
+                        if (instruction.opcode == ("invalid"))
                         {
                             break;
                         }
                         writer.WriteLine($"{index:X8}\t{instruction.ToString()}");
                         index += instruction.x86Length;
 
-                        if (instruction.zygote.op == "jmp")
+                        if (instruction.zygote.opcode == "jmp")
                         {
                             var target = instruction.operand[0].lval + instruction.x86Length;
                             input.index = target;

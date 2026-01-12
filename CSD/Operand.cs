@@ -5,14 +5,14 @@ namespace CSD;
 public class Operand
 {
     public long x86Length;
-    public Instruction parent;
+    public Instruction? parent;
     public long eip;
-    public String seg;
-    public String type, _base;
+    public String? seg;
+    public String? type, _base;
     public int size;
     public long lval;
-    public Pointer ptr; // should be same as lval somehow
-    public String index;
+    public Pointer? ptr; // should be same as lval somehow
+    public String? index;
     public long offset, scale;
     public int cast;
     //long pc;
@@ -35,7 +35,7 @@ public class Operand
         //    b.append(intel_size(size));
         if (type == ("OP_MEM"))
         {
-            builder.Append(Instruction.intel_size(size));
+            builder.Append(Instruction.IntelModeSize(size));
             if (seg != null)
                 builder.Append(seg + ":");
             else if ((_base == null) && (index == null))
@@ -87,7 +87,7 @@ public class Operand
             {
                 if (lval < 0)
                 {
-                    if (Instruction.sign_extends.Contains(parent.op)) // these are sign extended
+                    if (Instruction.SignExtends.Contains(parent.opcode)) // these are sign extended
                         builder.Append($"0x{lval & ((1L << maxSize) - 1):X}");
                     else
                         builder.Append($"0x{lval & ((1L << size) - 1):X}");
