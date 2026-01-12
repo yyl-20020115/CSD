@@ -701,16 +701,16 @@ public static class Dissassembler
             // seg16:off16 
             op.type = "OP_PTR";
             op.size = 32;
-            op.dis_start = (int)input.Counter;
-            op.ptr = new Pointer(input.Read16(), input.Read16());
+            op.DisStart = (int)input.Counter;
+            op.pointer = new Pointer(input.Read16(), input.Read16());
         }
         else
         {
             // seg16:off32 
             op.type = "OP_PTR";
             op.size = 48;
-            op.dis_start = (int)input.Counter;
-            op.ptr = new Pointer(input.Read32(), input.Read16());
+            op.DisStart = (int)input.Counter;
+            op.pointer = new Pointer(input.Read32(), input.Read16());
         }
     }
 
@@ -878,7 +878,7 @@ public static class Dissassembler
         // extract offset, if any 
         if ((op.offset == 8) || (op.offset == 16) || (op.offset == 32) || (op.offset == 64))
         {
-            op.dis_start = (int)input.Counter;
+            op.DisStart = (int)input.Counter;
             op.lval = input.Read(op.offset);
             long bound = 1L << (int)(op.offset - 1);
             if (op.lval > bound)
@@ -898,7 +898,7 @@ public static class Dissassembler
     {
         op.size = ResolveOperandSize(mode, inst, s);
         op.type = "OP_IMM";
-        op.imm_start = (int)input.Counter;
+        op.ImmStart = (int)input.Counter;
         op.lval = input.Read(op.size);
     }
 
@@ -907,7 +907,7 @@ public static class Dissassembler
         // offset
         op.seg = inst.prefix.seg;
         op.offset = inst.address_mode;
-        op.dis_start = (int)input.Counter;
+        op.DisStart = (int)input.Counter;
         op.lval = input.Read(inst.address_mode);
         op.type = "OP_MEM";
         op.size = ResolveOperandSize(mode, inst, s);

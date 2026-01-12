@@ -11,7 +11,7 @@ public class Operand
     public string? type, _base;
     public int size;
     public long lval;
-    public Pointer? ptr; // should be same as lval somehow
+    public Pointer? pointer; // should be same as lval somehow
     public string? index;
     public long offset, scale;
     public int cast;
@@ -19,15 +19,15 @@ public class Operand
     //value;
     //ref;
     // required for patterns
-    public int maxSize;
-    public int imm_start, dis_start;
+    public int MaxSize;
+    public int ImmStart, DisStart;
 
-    public override string ToString() => ToString(false);
+    public override string ToString() => ToString(false) ?? "";
     public string? ToString(bool pattern = false)
     {
         if (type == null)
             return "UNKNOWN - AVX?";
-        if (type==("OP_REG"))
+        if (type == ("OP_REG"))
             return _base;
         bool first = true;
         var builder = new StringBuilder();
@@ -81,14 +81,14 @@ public class Operand
             if ((_base != null) || (index != null))
                 builder.Append(']');
         }
-        else if (type==("OP_IMM"))
+        else if (type == ("OP_IMM"))
         {
             if (!pattern)
             {
                 if (lval < 0)
                 {
                     if (Instruction.SignExtends.Contains(parent.opcode)) // these are sign extended
-                        builder.Append($"0x{lval & ((1L << maxSize) - 1):X}");
+                        builder.Append($"0x{lval & ((1L << MaxSize) - 1):X}");
                     else
                         builder.Append($"0x{lval & ((1L << size) - 1):X}");
                 }
@@ -102,12 +102,12 @@ public class Operand
                     builder.Append("II");
             }
         }
-        else if (type==("OP_JIMM"))
+        else if (type == ("OP_JIMM"))
         {
             if (!pattern)
             {
                 if (eip + Length + lval < 0)
-                    builder.Append($"0x{(eip + Length + lval) & ((1L << maxSize) - 1):X}");
+                    builder.Append($"0x{(eip + Length + lval) & ((1L << MaxSize) - 1):X}");
                 else
                     builder.Append($"0x{eip + Length + lval:X}");
             }
@@ -118,7 +118,7 @@ public class Operand
                     builder.Append("II");
             }
         }
-        else if (type==("OP_PTR"))
+        else if (type == ("OP_PTR"))
         {
             if (!pattern)
                 builder.Append($"0x{{0:X4}}:0x{{1:X}}");

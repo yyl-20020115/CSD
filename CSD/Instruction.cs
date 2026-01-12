@@ -91,7 +91,7 @@ public class Instruction
             op.Length = Length;
         }
         foreach (var op in operand)
-            op.maxSize = maxSize;
+            op.MaxSize = maxSize;
 
         return WithSize
             ? operand.Length switch

@@ -85,7 +85,7 @@ public static class PatternGenerator
                 }
                 if (op.type == ("OP_IMM") || op.type == ("OP_JIMM"))
                 {
-                    for (int c = op.imm_start; c < op.imm_start + op.size / 8; c++)
+                    for (int c = op.ImmStart; c < op.ImmStart + op.size / 8; c++)
                     {
                         pattern[2 * c + 0] = 'I';
                         pattern[2 * c + 1] = 'I';
@@ -95,7 +95,7 @@ public static class PatternGenerator
                 {
                     if (op.offset > 0)
                     {
-                        for (int c = op.dis_start; c < op.dis_start + op.offset / 8; c++)
+                        for (int c = op.DisStart; c < op.DisStart + op.offset / 8; c++)
                         {
                             pattern[2 * c + 0] = 'D';
                             pattern[2 * c + 1] = 'D';
@@ -106,12 +106,12 @@ public static class PatternGenerator
                 {
                     if (op.size == 32)
                     {
-                        for (int c = op.dis_start; c < op.dis_start + 2; c++)
+                        for (int c = op.DisStart; c < op.DisStart + 2; c++)
                         {
                             pattern[2 * c + 0] = 'D';
                             pattern[2 * c + 1] = 'D';
                         }
-                        for (int c = op.dis_start + 2; c < op.dis_start + 4; c++)
+                        for (int c = op.DisStart + 2; c < op.DisStart + 4; c++)
                         {
                             pattern[2 * c + 0] = 'S';
                             pattern[2 * c + 1] = 'S';
@@ -119,12 +119,12 @@ public static class PatternGenerator
                     }
                     else if (op.size == 48)
                     {
-                        for (int c = op.dis_start; c < op.dis_start + 4; c++)
+                        for (int c = op.DisStart; c < op.DisStart + 4; c++)
                         {
                             pattern[2 * c + 0] = 'D';
                             pattern[2 * c + 1] = 'D';
                         }
-                        for (int c = op.dis_start + 4; c < op.dis_start + 6; c++)
+                        for (int c = op.DisStart + 4; c < op.DisStart + 6; c++)
                         {
                             pattern[2 * c + 0] = 'S';
                             pattern[2 * c + 1] = 'S';
