@@ -12,13 +12,14 @@ public static class Dissassembler
     
     public static Instruction Decode(ReversibleStream input, int mode)
     {
+        var offset = input.Counter;
         var instruction = new Instruction();
         GetPrefixes(mode, input, instruction);
         SearchTable(mode, input, instruction);
         DoMode(mode, input, instruction);
         DisassembleOperands(mode, input, instruction);
         ResolveOperator(mode, input, instruction);
-        instruction.Length = input.Counter;
+        instruction.Length = input.Counter - offset;
         return instruction;
     }
 

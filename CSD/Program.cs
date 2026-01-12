@@ -16,39 +16,38 @@ public static class Program
                 var data = File.ReadAllBytes(args[0]);
                 var input = new ReversibleStream(data);
                 int mode = 16;
-                long index = 0;
                 using var writer = new StreamWriter(args[1]);
                 while (true)
                 {
-                    Instruction instruction;
+                    var offset = input.index;
                     try
                     {
-                        instruction = Dissassembler.Decode(input, mode);
+                        var instruction = Dissassembler.Decode(input, mode);
                         if (instruction.opcode == ("invalid"))
                         {
                             break;
                         }
-                        writer.WriteLine($"{index:X8}\t{instruction.ToString()}");
-                        index += instruction.Length;
+                        writer.WriteLine($"{offset:X8}\t{instruction.ToString()}");
 
-                        if (instruction.template.opcode == "jmp")
+                        if (instruction?.template?.opcode == "jmp")
                         {
                             var target = instruction.operand[0].lval + instruction.Length;
-                            input.index = target;
+                            if (target > input.index)
+                            {
+                                for(; input.index<target; input.index++)
+                                {
+                                    writer.WriteLine($"{input.index:X8}\tdb {data[input.index]:X02}");
+                                }
+                            }
                         }
 
-                        if (index == data.Length)
+                        if (input.index == data.Length)
                             break;
                     }
-                    catch (InvalidOperationException e)
+                    catch (Exception ex)
                     {
                         break;
                     }
-                    catch (IndexOutOfRangeException e)
-                    {
-                        break;
-                    }
-                   
                 }
             }
         }
