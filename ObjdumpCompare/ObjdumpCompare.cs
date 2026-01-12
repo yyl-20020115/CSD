@@ -104,7 +104,7 @@ public static class ObjdumpCompare
                 catch (Exception e)
                 {
                     if (!objdump.StartsWith('v')) // AVX
-                        Console.WriteLine($"Disassemble error on : {x86Bytes} ({objdump})");
+                        Console.WriteLine($"Disassemble error on : {x86Bytes} ({objdump}) {e.Message}");
                     continue;
                     //throw e;
                     //e.printStackTrace();
@@ -128,8 +128,8 @@ public static class ObjdumpCompare
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Print error on : {x86Bytes} ({objdump})");
-                    throw e;
+                    Console.WriteLine($"Print error on : {x86Bytes} ({objdump}) {e.Message}");
+                    //throw e;
                 }
             }
         }

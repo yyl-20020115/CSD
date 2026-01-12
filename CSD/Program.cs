@@ -6,29 +6,67 @@ public static class Program
     {
         if (args.Length == 0)
         {
-            Console.WriteLine(
-                 Dissassembler.Decode(new([5]), 32));
+            Console.WriteLine("CSD <Input> <Output>");
             return 0;
         }
-        else
+        else if (args.Length == 2)
         {
-            int size = 32;
-            if (args[0] == ("-rm"))
+            if (File.Exists(args[0]) && File.Exists(args[1]))
             {
-                size = 16;
-                args = args[1..];
-            }
-            var data = new byte[args.Length];
-            for (int i = 0; i < args.Length; i++)
-                data[i] = (byte)(byte.TryParse(args[i], System.Globalization.NumberStyles.HexNumber, null, out var v) ? v : 0);
-            Console.Write("Raw bytes: ");
-            for (int i = 0; i < args.Length; i++)
-                Console.Write($"{data[i]:X2} ");
-            Console.WriteLine();
-            Console.WriteLine(
-                Dissassembler.Decode(new(data), size));
-            return 0;
-        }
-    }
+                var data = File.ReadAllBytes(args[0]);
+                var input = new ReversibleStream(data);
+                int mode = 16;
+                int index = 0;
+                using var writer = new StreamWriter(args[1]);
+                while (true)
+                {
+                    Instruction instruction;
+                    try
+                    {
+                        instruction = Dissassembler.Decode(input, mode);
+                    }
+                    catch (InvalidOperationException e)
+                    {
+                        index = Advance(index, data);
+                        if (index == -1)
+                            break;
+                        continue;
+                    }
+                    catch (IndexOutOfRangeException e)
+                    {
+                        --index;
+                        if ((index == 0) && (data[0] == 0xff))
+                            break;
+                        ++data[index];
+                        for (int i = index + 1; i < data.Length; i++)
+                            data[i] = 0;
+                        continue;
+                    }
+                    if (instruction.op == ("invalid"))
+                    {
+                        index = Advance(index, data);
+                        if (index == -1)
+                            break;
+                        continue;
+                    }
+                    writer.WriteLine(instruction.ToString());
 
+                }
+                return 0;
+            }
+        }
+        return 0;
+    }
+    public static int Advance(int index, byte[] data)
+    {
+        while ((index > 0) && !((data[index] & 0xFF) < 255))
+            index--;
+        if ((index == 0) && (data[0] == 0xff))
+            return -1;
+        data[index]++;
+        for (int i = index + 1; i < data.Length; i++)
+            data[i] = 0;
+        return index;
+    }
+    
 }

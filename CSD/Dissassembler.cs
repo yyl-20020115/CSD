@@ -1,6 +1,6 @@
 namespace CSD;
 
-using static ZygoteOperand;
+using static TemplateOperand;
 using static Table;
 public static class Dissassembler
 {

@@ -431,7 +431,7 @@ public static class TableGen
         // now print to file
         using var writer = new StreamWriter(table_path);
         writer.Write("namespace CSD;\n\n");
-        writer.Write("using static ZygoteOperand;\n\n");
+        writer.Write("using static TemplateOperand;\n\n");
         writer.Write("public class Table\n{\n");
 
         writer.Write("\n");
@@ -478,7 +478,7 @@ public static class TableGen
         // Generate instruction tables
         foreach (var t in table_names)
         {
-            writer.Write("private static readonly ZygoteInstruction[] " + t.ToLower() + " = new ZygoteInstruction[]{\n");
+            writer.Write("private static readonly TemplateInstruction[] " + t.ToLower() + " = new TemplateInstruction[]{\n");
             for (int i = 0; i < table_sizes[t]; i++)
             {
                 string index = $"{i:X02}";// string.format("%02X", i);
@@ -493,7 +493,7 @@ public static class TableGen
         }
 
         writer.Write("\n// the order of this table matches itab_index ");
-        writer.Write("\npublic static readonly ZygoteInstruction[][] itab_list = new ZygoteInstruction[][]{\n");
+        writer.Write("\npublic static readonly TemplateInstruction[][] itab_list = new TemplateInstruction[][]{\n");
         foreach (string name in table_names)
             writer.Write("    " + name.ToLower() + ",\n");
         writer.Write("};\n");
@@ -528,6 +528,6 @@ public static class TableGen
             mnm = "\"invalid\"";
             pfx = "P_none";
         }
-        return $"  new ZygoteInstruction( {mnm + ",":-16} {opr + ",":-26} {pfx} ),\n";
+        return $"  new TemplateInstruction( {mnm + ",":-16} {opr + ",":-26} {pfx} ),\n";
     }
 }

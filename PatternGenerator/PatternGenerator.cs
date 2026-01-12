@@ -7,8 +7,38 @@ public static class PatternGenerator
 {
     public static void Main(string[] args)
     {
-        var data = new byte[15];
-        var input = new ReversibleStream(data);
+
+        switch (args.Length)
+        {
+            case 0:
+                Console.WriteLine("PG <Input> <Output>");
+                break;
+            case 1:
+                if (File.Exists(args[0]))
+                {
+                    Analyse(File.ReadAllBytes(args[0]), Console.Out);
+                }
+                break;
+            case >= 2:
+                {
+                    if (File.Exists(args[0]) && File.Exists(args[1]))
+                    {
+                        using var writer = new StreamWriter(args[1]);
+                        Analyse(File.ReadAllBytes(args[0]), writer);
+                    }
+
+                    break;
+                }
+        }
+    }
+
+    public static void Analyse(byte[] data,TextWriter writer)
+    {
+        Analyse(data, new ReversibleStream(data),writer);
+    }
+
+    public static void Analyse(byte[] data, ReversibleStream input,TextWriter writer)
+    {
         int mode = 32;
         int index = 0;
         while (true)
@@ -35,7 +65,7 @@ public static class PatternGenerator
                     data[i] = 0;
                 continue;
             }
-            if (instruction.op==("invalid"))
+            if (instruction.op == ("invalid"))
             {
                 index = Advance(index, data);
                 if (index == -1)
@@ -102,13 +132,14 @@ public static class PatternGenerator
                     }
                 }
             }
-            Console.WriteLine($"{pattern} {disam}");
+            writer.WriteLine($"{pattern} {disam}");
             // find last byte that is not II SS or DD and increment it, zeroing above it
             index = LastOpcodeByteBefore(pattern.ToString(), pattern.Length - 1);
             index = Advance(index, data);
             if (index == -1)
                 break;
         }
+
     }
 
     public static int Advance(int index, byte[] data)
@@ -125,7 +156,7 @@ public static class PatternGenerator
 
     public static int LastOpcodeByteBefore(string pat, int index)
     {
-        while ((index > 0) && ((pat[(index)] == 'I') 
+        while ((index > 0) && ((pat[(index)] == 'I')
             || (pat[(index)] == 'D') || (pat[(index)] == 'S')))
             index--;
         return index >> 1;

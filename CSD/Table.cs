@@ -1,6 +1,6 @@
 namespace CSD;
 
-using static ZygoteOperand;
+using static TemplateOperand;
 public class Table
 {
 
