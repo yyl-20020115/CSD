@@ -10,16 +10,16 @@ public class Prefix
     {
         var builder = new StringBuilder();
         if (Lock != 0)
-            builder.Append("lock ");
+            builder.Append("lock");
         if (Rep != 0)
-            builder.Append("rep ");
+            builder.Append("rep");
         if (Repe != 0)
-            builder.Append("repe ");
+            builder.Append("repe");
         if (Repne != 0)
-            builder.Append("repne ");
+            builder.Append("repne");
         //if (seg != null)
-        //    b.append(seg+" ");
-
+        //    builder.append(seg);
+        builder.Append(' ');
         return builder.ToString();
     }
 }

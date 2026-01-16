@@ -97,7 +97,7 @@ public class Operand
             }
             else
             {
-                builder.Append("$");
+                builder.Append('$');
                 for (int i = 0; i < Size / 8; i++)
                     builder.Append("II");
             }

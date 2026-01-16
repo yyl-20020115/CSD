@@ -7,7 +7,6 @@ public static class PatternGenerator
 {
     public static void Main(string[] args)
     {
-
         switch (args.Length)
         {
             case 0:
@@ -26,7 +25,6 @@ public static class PatternGenerator
                         using var writer = new StreamWriter(args[1]);
                         Analyse(File.ReadAllBytes(args[0]), writer);
                     }
-
                     break;
                 }
         }
@@ -139,7 +137,6 @@ public static class PatternGenerator
             if (index == -1)
                 break;
         }
-
     }
 
     public static int Advance(int index, byte[] data)
