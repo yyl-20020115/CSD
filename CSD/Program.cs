@@ -19,7 +19,7 @@ public static class Program
                 using var writer = new StreamWriter(args[1]);
                 while (true)
                 {
-                    var offset = input.index;
+                    var offset = input.Index;
                     try
                     {
                         var instruction = Dissassembler.Decode(input, mode);
@@ -32,16 +32,16 @@ public static class Program
                         if (instruction?.template?.opcode == "jmp")
                         {
                             var target = instruction.operand[0].lval + instruction.Length;
-                            if (target > input.index)
+                            if (target > input.Index)
                             {
-                                for(; input.index<target; input.index++)
+                                for(; input.Index < target; input.Index++)
                                 {
-                                    writer.WriteLine($"{input.index:X8}\tdb {data[input.index]:X02}");
+                                    writer.WriteLine($"{input.Index:X8}\tdb {data[input.Index]:X02}");
                                 }
                             }
                         }
 
-                        if (input.index == data.Length)
+                        if (input.Index == data.Length)
                             break;
                     }
                     catch (Exception ex)
@@ -53,16 +53,4 @@ public static class Program
         }
         return 0;
     }
-    public static int Advance(int index, byte[] data)
-    {
-        while ((index > 0) && !((data[index] & 0xFF) < 255))
-            index--;
-        if ((index == 0) && (data[0] == 0xff))
-            return -1;
-        data[index]++;
-        for (int i = index + 1; i < data.Length; i++)
-            data[i] = 0;
-        return index;
-    }
-    
 }
