@@ -65,7 +65,7 @@ public static class PatternGenerator
                     data[i] = 0;
                 continue;
             }
-            if (instruction.opcode == ("invalid"))
+            if (instruction.OpCode == ("invalid"))
             {
                 index = Advance(index, data);
                 if (index == -1)
@@ -77,34 +77,34 @@ public static class PatternGenerator
                 pattern.Append($"{data[c] & 0xFF:X2}");
             // mask out with DD and II
             var disam = instruction.ToString();
-            foreach (var op in instruction.operand)
+            foreach (var op in instruction.Operand)
             {
-                if (op.type == null)
+                if (op.Type == null)
                 {
                     disam = "Unknown";
                 }
-                if (op.type == ("OP_IMM") || op.type == ("OP_JIMM"))
+                if (op.Type == ("OP_IMM") || op.Type == ("OP_JIMM"))
                 {
-                    for (int c = op.ImmStart; c < op.ImmStart + op.size / 8; c++)
+                    for (int c = op.ImmStart; c < op.ImmStart + op.Size / 8; c++)
                     {
                         pattern[2 * c + 0] = 'I';
                         pattern[2 * c + 1] = 'I';
                     }
                 }
-                else if (op.type == ("OP_MEM"))
+                else if (op.Type == ("OP_MEM"))
                 {
-                    if (op.offset > 0)
+                    if (op.Offset > 0)
                     {
-                        for (int c = op.DisStart; c < op.DisStart + op.offset / 8; c++)
+                        for (int c = op.DisStart; c < op.DisStart + op.Offset / 8; c++)
                         {
                             pattern[2 * c + 0] = 'D';
                             pattern[2 * c + 1] = 'D';
                         }
                     }
                 }
-                else if (op.type == ("OP_PTR"))
+                else if (op.Type == ("OP_PTR"))
                 {
-                    if (op.size == 32)
+                    if (op.Size == 32)
                     {
                         for (int c = op.DisStart; c < op.DisStart + 2; c++)
                         {
@@ -117,7 +117,7 @@ public static class PatternGenerator
                             pattern[2 * c + 1] = 'S';
                         }
                     }
-                    else if (op.size == 48)
+                    else if (op.Size == 48)
                     {
                         for (int c = op.DisStart; c < op.DisStart + 4; c++)
                         {

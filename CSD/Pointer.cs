@@ -1,7 +1,7 @@
 namespace CSD;
 
-public class Pointer(int offset, int segment)
+public class Pointer(int Offset, int Segment)
 {
-    public int offset = offset;
-    public int segment = segment;
+    public int Offset = Offset;
+    public int Segment = Segment;
 }

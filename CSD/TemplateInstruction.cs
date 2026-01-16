@@ -1,8 +1,8 @@
 namespace CSD;
 
-public class TemplateInstruction(string mnemonic, TemplateOperand op1, TemplateOperand op2, TemplateOperand op3, int prefix)
+public class TemplateInstruction(string Mnemonic, TemplateOperand Operand1, TemplateOperand Operand2, TemplateOperand Operand3, int Prefix)
 {
-    public readonly string opcode = mnemonic;
-    public readonly TemplateOperand[] operand = [op1, op2, op3];
-    public readonly int prefix = prefix;
+    public readonly string OpCode = Mnemonic;
+    public readonly TemplateOperand[] Operand = [Operand1, Operand2, Operand3];
+    public readonly int Prefix = Prefix;
 }

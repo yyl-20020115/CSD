@@ -4,63 +4,63 @@ using System.Collections.Generic;
 
 public class Instruction
 {
-    private static readonly HashSet<string> invalid = [];
-    private static readonly HashSet<string> call = [];
-    private static readonly HashSet<string> ret = [];
-    private static readonly HashSet<string> jmp = [];
-    private static readonly HashSet<string> jcc = [];
-    private static readonly HashSet<string> hlt = [];
+    private static readonly HashSet<string> Invalid = [];
+    private static readonly HashSet<string> Call = [];
+    private static readonly HashSet<string> Ret = [];
+    private static readonly HashSet<string> Jmp = [];
+    private static readonly HashSet<string> Jcc = [];
+    private static readonly HashSet<string> Hlt = [];
 
     static Instruction()
     {
-        invalid.Add("invalid");
-        call.Add("call");
-        call.Add("syscall");
-        call.Add("vmcall");
-        call.Add("vmmcall");
-        ret.Add("ret");
-        ret.Add("retf");
-        ret.Add("sysret");
-        ret.Add("iretw");
-        ret.Add("iretd");
-        ret.Add("iretq");
-        jmp.Add("jmp");
-        jcc.Add("jo");
-        jcc.Add("jno");
-        jcc.Add("jb");
-        jcc.Add("jbe");
-        jcc.Add("ja");
-        jcc.Add("jae");
-        jcc.Add("je");
-        jcc.Add("jne");
-        jcc.Add("js");
-        jcc.Add("jns");
-        jcc.Add("jp");
-        jcc.Add("jnp");
-        jcc.Add("jl");
-        jcc.Add("jle");
-        jcc.Add("jg");
-        jcc.Add("jge");
-        jcc.Add("jcxz");
-        jcc.Add("jecxz");
-        jcc.Add("jrcxz");
-        jcc.Add("loop");
-        jcc.Add("loope");
-        jcc.Add("loopnz");
-        hlt.Add("hlt");
+        Invalid.Add("invalid");
+        Call.Add("call");
+        Call.Add("syscall");
+        Call.Add("vmcall");
+        Call.Add("vmmcall");
+        Ret.Add("ret");
+        Ret.Add("retf");
+        Ret.Add("sysret");
+        Ret.Add("iretw");
+        Ret.Add("iretd");
+        Ret.Add("iretq");
+        Jmp.Add("jmp");
+        Jcc.Add("jo");
+        Jcc.Add("jno");
+        Jcc.Add("jb");
+        Jcc.Add("jbe");
+        Jcc.Add("ja");
+        Jcc.Add("jae");
+        Jcc.Add("je");
+        Jcc.Add("jne");
+        Jcc.Add("js");
+        Jcc.Add("jns");
+        Jcc.Add("jp");
+        Jcc.Add("jnp");
+        Jcc.Add("jl");
+        Jcc.Add("jle");
+        Jcc.Add("jg");
+        Jcc.Add("jge");
+        Jcc.Add("jcxz");
+        Jcc.Add("jecxz");
+        Jcc.Add("jrcxz");
+        Jcc.Add("loop");
+        Jcc.Add("loope");
+        Jcc.Add("loopnz");
+        Hlt.Add("hlt");
     }
 
     /*input;
       mode;
       add;*/
     public long Length;
-    public long eip;
-    public TemplateInstruction? template;
-    public string opcode = "invalid";
-    public Operand[] operand = [];
-    public Prefix prefix = new();
-    public int operand_mode, address_mode;
-    public string? branch_dist;
+    public long EIP;
+    public TemplateInstruction? Template;
+    public string OpCode = "invalid";
+    public Operand[] Operand = [];
+    public Prefix Prefix = new();
+    public int OperandMode, AddressMode;
+    public string? BranchDist;
 
     public Instruction() { }
 
@@ -82,31 +82,31 @@ public class Instruction
     public string ToString(bool WithSize = false)
     {
         int maxSize = 0;
-        foreach (var op in operand)
+        foreach (var op in Operand)
         {
-            op.parent = this;
-            if (op.size > maxSize)
-                maxSize = op.size;
-            op.eip = eip;
+            op.Parent = this;
+            if (op.Size > maxSize)
+                maxSize = op.Size;
+            op.EIP = EIP;
             op.Length = Length;
         }
-        foreach (var op in operand)
+        foreach (var op in Operand)
             op.MaxSize = maxSize;
 
         return WithSize
-            ? operand.Length switch
+            ? Operand.Length switch
             {
-                1 => $"({Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
-                2 => $"({Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}",
-                3 => $"({Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}, {operand[1]}, {operand[2]}",
-                _ => $"({Length} bytes) {prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)}",
+                1 => $"({Length} bytes) {Prefix}{OpCode + (BranchDist == null ? "" : " " + BranchDist)} {Operand[0]}",
+                2 => $"({Length} bytes) {Prefix}{OpCode + (BranchDist == null ? "" : " " + BranchDist)} {Operand[0]}, {Operand[1]}",
+                3 => $"({Length} bytes) {Prefix}{OpCode + (BranchDist == null ? "" : " " + BranchDist)} {Operand[0]}, {Operand[1]}, {Operand[2]}",
+                _ => $"({Length} bytes) {Prefix}{OpCode + (BranchDist == null ? "" : " " + BranchDist)}",
             }
-            : operand.Length switch
+            : Operand.Length switch
             {
-                1 => $"{prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]}",
-                2 => $"{prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]},{operand[1]}",
-                3 => $"{prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)} {operand[0]},{operand[1]},{operand[2]}",
-                _ => $"{prefix}{opcode + (branch_dist == null ? "" : " " + branch_dist)}",
+                1 => $"{Prefix}{OpCode + (BranchDist == null ? "" : " " + BranchDist)} {Operand[0]}",
+                2 => $"{Prefix}{OpCode + (BranchDist == null ? "" : " " + BranchDist)} {Operand[0]},{Operand[1]}",
+                3 => $"{Prefix}{OpCode + (BranchDist == null ? "" : " " + BranchDist)} {Operand[0]},{Operand[1]},{Operand[2]}",
+                _ => $"{Prefix}{OpCode + (BranchDist == null ? "" : " " + BranchDist)}",
             };
     }
 }

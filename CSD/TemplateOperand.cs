@@ -1,6 +1,6 @@
 namespace CSD;
 
-public class TemplateOperand(int type, int size)
+public class TemplateOperand(int Type, int Size)
 {
     public static readonly int VENDOR_INTEL = 0;
     public static readonly int VENDOR_AMD = 1;
@@ -112,7 +112,8 @@ public class TemplateOperand(int type, int size)
 
     public static int REX_B(int r) => (0x1 & r) >> 0;
 
-    public static int REX_PFX_MASK(int n) => ((P_REXW(n) << 3) |
+    public static int REX_PFX_MASK(int n) 
+            => ((P_REXW(n) << 3) |
                 (P_REXR(n) << 2) |
                 (P_REXX(n) << 1) |
                 (P_REXB(n) << 0));
@@ -270,7 +271,7 @@ public class TemplateOperand(int type, int size)
     public static List<int> ops_segs = [
             OP_ES, OP_CS, OP_DS, OP_SS, OP_FS, OP_GS];
 
-    public readonly int type = type, size = size;
+    public readonly int type = Type, size = Size;
 
     // operands
     public static readonly TemplateOperand O_rSPr12 =  new(OP_rSPr12, SZ_NA);

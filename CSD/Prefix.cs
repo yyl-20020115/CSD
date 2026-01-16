@@ -4,18 +4,18 @@ namespace CSD;
 
 public class Prefix
 {
-    public int rex, opr, adr, _lock, rep, repe, repne, insn;
+    public int Rex, Opr, Adr, Lock, Rep, Repe, Repne, Insn;
     public string seg = "";
     public override string ToString()
     {
         var builder = new StringBuilder();
-        if (_lock != 0)
+        if (Lock != 0)
             builder.Append("lock ");
-        if (rep != 0)
+        if (Rep != 0)
             builder.Append("rep ");
-        if (repe != 0)
+        if (Repe != 0)
             builder.Append("repe ");
-        if (repne != 0)
+        if (Repne != 0)
             builder.Append("repne ");
         //if (seg != null)
         //    b.append(seg+" ");

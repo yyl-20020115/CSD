@@ -23,15 +23,15 @@ public static class Program
                     try
                     {
                         var instruction = Dissassembler.Decode(input, mode);
-                        if (instruction.opcode == ("invalid"))
+                        if (instruction.OpCode == ("invalid"))
                         {
                             break;
                         }
                         writer.WriteLine($"{offset:X8}\t{instruction.ToString()}");
 
-                        if (instruction?.template?.opcode == "jmp")
+                        if (instruction?.Template?.OpCode == "jmp")
                         {
-                            var target = instruction.operand[0].lval + instruction.Length;
+                            var target = instruction.Operand[0].Lval + instruction.Length;
                             if (target > input.Index)
                             {
                                 for(; input.Index < target; input.Index++)

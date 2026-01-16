@@ -5,16 +5,16 @@ namespace CSD;
 public class Operand
 {
     public long Length;
-    public Instruction? parent;
-    public long eip;
-    public string? seg;
-    public string? type, _base;
-    public int size;
-    public long lval;
-    public Pointer? pointer; // should be same as lval somehow
-    public string? index;
-    public long offset, scale;
-    public int cast;
+    public Instruction? Parent;
+    public long EIP;
+    public string? Segment;
+    public string? Type, Base;
+    public int Size;
+    public long Lval;
+    public Pointer? Pointer; // should be same as lval somehow
+    public string? Index;
+    public long Offset, Scale;
+    public int Cast;
     //long pc;
     //value;
     //ref;
@@ -25,100 +25,100 @@ public class Operand
     public override string ToString() => ToString(false) ?? "";
     public string? ToString(bool pattern = false)
     {
-        if (type == null)
+        if (Type == null)
             return "UNKNOWN - AVX?";
-        if (type == ("OP_REG"))
-            return _base;
+        if (Type == ("OP_REG"))
+            return Base;
         bool first = true;
         var builder = new StringBuilder();
         //if (cast == 1)
         //    b.append(intel_size(size));
-        if (type == ("OP_MEM"))
+        if (Type == ("OP_MEM"))
         {
-            builder.Append(Instruction.IntelModeSize(size));
-            if (seg != null)
-                builder.Append(seg + ":");
-            else if ((_base == null) && (index == null))
+            builder.Append(Instruction.IntelModeSize(Size));
+            if (Segment != null)
+                builder.Append(Segment + ":");
+            else if ((Base == null) && (Index == null))
                 builder.Append("ds:");
-            if ((_base != null) || (index != null))
+            if ((Base != null) || (Index != null))
                 builder.Append('[');
 
-            if (_base != null)
+            if (Base != null)
             {
-                builder.Append(_base);
+                builder.Append(Base);
                 first = false;
             }
-            if (index != null)
+            if (Index != null)
             {
                 if (!first)
                     builder.Append('+');
-                builder.Append(index);
+                builder.Append(Index);
                 first = false;
             }
-            if (scale != 0)
-                builder.Append("*" + scale);
-            if ((offset == 8) || (offset == 16) || (offset == 32) || (offset == 64))
+            if (Scale != 0)
+                builder.Append("*" + Scale);
+            if ((Offset == 8) || (Offset == 16) || (Offset == 32) || (Offset == 64))
             {
                 if (!pattern)
                 {
-                    if ((lval < 0) && ((_base != null) || (index != null)))
-                        builder.Append($"-0x{-lval:X}");
+                    if ((Lval < 0) && ((Base != null) || (Index != null)))
+                        builder.Append($"-0x{-Lval:X}");
                     else
                     {
                         if (!first)
-                            builder.Append($"+0x{lval & ((1L << (int)offset) - 1):X}");
+                            builder.Append($"+0x{Lval & ((1L << (int)Offset) - 1):X}");
                         else
-                            builder.Append($"0x{lval & ((1L << (int)offset) - 1):X}");
+                            builder.Append($"0x{Lval & ((1L << (int)Offset) - 1):X}");
                     }
                 }
                 else
                 {
                     builder.Append('$');
-                    for (int i = 0; i < offset / 8; i++)
+                    for (int i = 0; i < Offset / 8; i++)
                         builder.Append("DD");
                 }
             }
-            if ((_base != null) || (index != null))
+            if ((Base != null) || (Index != null))
                 builder.Append(']');
         }
-        else if (type == ("OP_IMM"))
+        else if (Type == ("OP_IMM"))
         {
             if (!pattern)
             {
-                if (lval < 0)
+                if (Lval < 0)
                 {
-                    if (Instruction.SignExtends.Contains(parent.opcode)) // these are sign extended
-                        builder.Append($"0x{lval & ((1L << MaxSize) - 1):X}");
+                    if (Instruction.SignExtends.Contains(Parent.OpCode)) // these are sign extended
+                        builder.Append($"0x{Lval & ((1L << MaxSize) - 1):X}");
                     else
-                        builder.Append($"0x{lval & ((1L << size) - 1):X}");
+                        builder.Append($"0x{Lval & ((1L << Size) - 1):X}");
                 }
                 else
-                    builder.Append($"0x{lval:X}");
+                    builder.Append($"0x{Lval:X}");
             }
             else
             {
                 builder.Append("$");
-                for (int i = 0; i < size / 8; i++)
+                for (int i = 0; i < Size / 8; i++)
                     builder.Append("II");
             }
         }
-        else if (type == ("OP_JIMM"))
+        else if (Type == ("OP_JIMM"))
         {
             if (!pattern)
             {
-                if (eip + Length + lval < 0)
-                    builder.Append($"0x{(eip + Length + lval) & ((1L << MaxSize) - 1):X}");
+                if (EIP + Length + Lval < 0)
+                    builder.Append($"0x{(EIP + Length + Lval) & ((1L << MaxSize) - 1):X}");
                 else
-                    builder.Append($"0x{eip + Length + lval:X}");
+                    builder.Append($"0x{EIP + Length + Lval:X}");
             }
             else
             {
                 builder.Append('$');
-                for (int i = 0; i < size / 8; i++)
+                for (int i = 0; i < Size / 8; i++)
                     builder.Append("II");
             }
         }
-        else if (type == ("OP_PTR"))
+        else if (Type == ("OP_PTR"))
         {
             if (!pattern)
                 builder.Append($"0x{{0:X4}}:0x{{1:X}}");
@@ -126,6 +126,5 @@ public class Operand
                 builder.Append("$SSSS:$DDDDDDDD");
         }
         return builder.ToString();
-        //return string.format("[%s %s %s %d %x %x %x]", type, @base, index, size, lval, offset, scale);
     }
 }

@@ -99,7 +99,7 @@ public static class ObjdumpCompare
                 try
                 {
                     instruction = Dissassembler.Decode(input, mode);
-                    instruction.eip = address;
+                    instruction.EIP = address;
                 }
                 catch (Exception e)
                 {
@@ -111,7 +111,7 @@ public static class ObjdumpCompare
                 }
                 try
                 {
-                    if (instruction.opcode == ("invalid"))
+                    if (instruction.OpCode == ("invalid"))
                     {
                         var opname = objdump[..objdump.IndexOf(' ')];
                         if (!invalid.ContainsKey(opname))
@@ -121,8 +121,8 @@ public static class ObjdumpCompare
                         }
                         continue;
                     }
-                    if ((instruction.opcode != "nop") || (!objdump.Contains("xchg")))
-                        if (!excludes.Contains(instruction.opcode))
+                    if ((instruction.OpCode != "nop") || (!objdump.Contains("xchg")))
+                        if (!excludes.Contains(instruction.OpCode))
                             if (instruction.ToString().Replace("near ", "").Replace("0x", "").Replace("DWORD PTR ", "")!=(objdump.Replace("0x", "")))
                                 Console.WriteLine(x86Bytes + " -> " + instruction + " != " + objdump);
                 }
