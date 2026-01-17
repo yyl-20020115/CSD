@@ -323,7 +323,7 @@ public static class TableGen
                         dict.Add("name", table_name + "__op_" + table_index + "__mod");
                         tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
-                        string v2 = op.Substring(5, 7);
+                        var v2 = op.Substring(5, 7);
                         if (op.Length == 8)
                             v2 = op.Substring(5, 8);
 
@@ -340,7 +340,7 @@ public static class TableGen
                         dict.Add("name", table_name + "__op_" + table_index + "__osize");
                         tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
-                        table_index = mode_dict[op.Substring(2, 4 - 2)];
+                        table_index = mode_dict[op[2..4]];
                         table_size = 3;
                     }
                     else if (op.StartsWith("/A"))
@@ -350,7 +350,7 @@ public static class TableGen
                         dict.Add("name", table_name + "__op_" + table_index + "__asize");
                         tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
-                        table_index = mode_dict[(op.Substring(2, 4 - 2))];
+                        table_index = mode_dict[(op[2..4])];
                         table_size = 3;
                     }
                     else if (op.StartsWith("/M"))
@@ -360,7 +360,7 @@ public static class TableGen
                         dict.Add("name", table_name + "__op_" + table_index + "__mode");
                         tables[(table_name)].Add(table_index, dict);
                         table_name = tables[(table_name)][(table_index)][("name")];
-                        table_index = mode_dict[(op.Substring(2, 4 - 2))];
+                        table_index = mode_dict[(op[2..4])];
                         table_size = 3;
                     }
                     else if (op.StartsWith("/3DNOW"))
@@ -368,7 +368,7 @@ public static class TableGen
                         table_name = "itab__3dnow";
                         table_size = 256;
                     }
-                    else if (op.StartsWith("/"))
+                    else if (op.StartsWith('/'))
                     {
                         Dictionary<string, string> dict = [];
                         dict.Add("type", "grp_reg");
@@ -406,7 +406,7 @@ public static class TableGen
                 Dictionary<string, string> leaf = [];
                 leaf.Add("type", "leaf");
                 leaf.Add("name", mnemonic??"");
-                string pfx_string = "";
+                var pfx_string = "";
                 if (pfx.Length > 0)
                 {
                     pfx_string = pfx[0];
@@ -414,7 +414,7 @@ public static class TableGen
                         pfx_string += "|" + pfx[cc];
                 }
                 leaf.Add("pfx", pfx_string);
-                string opr_string = "";
+                var opr_string = "";
                 if (opr.Length > 0)
                 {
                     opr_string = opr[0];
@@ -452,7 +452,7 @@ public static class TableGen
         table_names.Sort();
 
         writer.Write("\n");
-        int h = 0;
+        var h = 0;
         foreach (var name in table_names)
         {
             writer.Write("public static readonly int " + name.ToUpper() + " = " + h + ";\n");
@@ -479,9 +479,9 @@ public static class TableGen
         foreach (var t in table_names)
         {
             writer.Write("private static readonly TemplateInstruction[] " + t.ToLower() + " = new TemplateInstruction[]{\n");
-            for (int i = 0; i < table_sizes[t]; i++)
+            for (var i = 0; i < table_sizes[t]; i++)
             {
-                string index = $"{i:X02}";// string.format("%02X", i);
+                var index = $"{i:X02}";// string.format("%02X", i);
                 Dictionary<string, string> dict = [];
                 dict.Add("type", "invalid");
                 if (tables[t].TryGetValue(index, out Dictionary<string, string>? value))
@@ -494,7 +494,7 @@ public static class TableGen
 
         writer.Write("\n// the order of this table matches itab_index ");
         writer.Write("\npublic static readonly TemplateInstruction[][] itab_list = new TemplateInstruction[][]{\n");
-        foreach (string name in table_names)
+        foreach (var name in table_names)
             writer.Write("    " + name.ToLower() + ",\n");
         writer.Write("};\n");
         writer.Write("}\n");

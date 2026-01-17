@@ -1,21 +1,17 @@
 using CSD;
-
-namespace ObjdumpCompare;
-
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+namespace ObjdumpCompare;
 public static class ObjdumpCompare
 {
     private static readonly Regex sps = new(@"\s+");
     public static void Main(string[] args)
     {
-        int mode = 32;
+        var mode = 32;
         Dictionary<string, string> invalid = [];
         foreach (var file in args)
         {
-            int count = 0;
+            var count = 0;
             using var reader = new StreamReader(file);
             while (true)
             {

@@ -37,8 +37,8 @@ public static class PatternGenerator
 
     public static void Analyse(byte[] data, ReversibleStream input,TextWriter writer)
     {
-        int mode = 32;
-        int index = 0;
+        var mode = 32;
+        var index = 0;
         while (true)
         {
             Instruction instruction;

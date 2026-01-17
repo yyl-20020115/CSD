@@ -244,31 +244,31 @@ public class TemplateOperand(int Type, int Size)
     public static readonly int SZ_Q =      64;
     public static readonly int SZ_T =      80;
 
-    public static List<int> ops8 = [OP_AL, OP_CL, OP_DL, OP_BL, OP_AH, OP_CH, OP_DH, OP_BH];
+    public static readonly List<int> ops8 = [OP_AL, OP_CL, OP_DL, OP_BL, OP_AH, OP_CH, OP_DH, OP_BH];
 
-    public static List<int> ops32 = [
+    public static readonly List<int> ops32 = [
             OP_eAX, OP_eCX, OP_eDX, OP_eBX,
             OP_eSP, OP_eBP, OP_eSI, OP_eDI];
 
-    public static List<int> ops64 = [
+    public static readonly List<int> ops64 = [
             OP_rAX, OP_rCX, OP_rDX, OP_rBX,
             OP_rSP, OP_rBP, OP_rSI, OP_rDI];
 
-    public static List<int> ops2 = [
+    public static readonly List<int> ops2 = [
             OP_rAXr8, OP_rCXr9, OP_rDXr10, OP_rBXr11,
             OP_rSPr12, OP_rBPr13, OP_rSIr14, OP_rDIr15,
             OP_rAX, OP_rCX, OP_rDX, OP_rBX,
             OP_rSP, OP_rBP, OP_rSI, OP_rDI];
 
-    public static List<int> ops3 = [
+    public static readonly List<int> ops3 = [
             OP_ALr8b, OP_CLr9b, OP_DLr10b, OP_BLr11b,
             OP_AHr12b, OP_CHr13b, OP_DHr14b, OP_BHr15b];
 
-    public static List<int> ops_st = [
+    public static readonly List<int> ops_st = [
             OP_ST0, OP_ST1, OP_ST2, OP_ST3,
             OP_ST4, OP_ST5, OP_ST6, OP_ST7];
 
-    public static List<int> ops_segs = [
+    public static readonly List<int> ops_segs = [
             OP_ES, OP_CS, OP_DS, OP_SS, OP_FS, OP_GS];
 
     public readonly int type = Type, size = Size;
